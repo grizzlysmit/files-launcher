@@ -1,0 +1,149 @@
+/* Add your custom extension styling here */
+gzzbutton {
+    margin-left:      2px;
+    margin-right:     2px;
+    margin-top:       2px;
+    margin-bottom:    2px;
+    padding:          3px;
+    border-radius:    3px;
+    border:           1px solid darkblue;
+    background-color: grey, 
+    color:            black;
+}
+
+.dialog-item-column-name {
+    margin-left:      2px !important;
+    margin-right:     2px !important;
+    margin-top:       2px !important;
+    margin-bottom:    2px !important;
+    padding:          3px;
+    border-radius:    3px;
+    border:           1px solid darkblue;
+    color:            black;
+    background-color: lightgrey, 
+}
+
+.dialog-item-column-name:checked {
+    margin-left:      2px !important;
+    margin-right:     2px !important;
+    margin-top:       2px !important;
+    margin-bottom:    2px !important;
+    padding:          3px;
+    border-radius:    3px;
+    border:           1px solid darkblue;
+    color:            black;
+    color:            cyan;
+    background-color: grey, 
+}
+
+.gzzdialog-header-item {
+    margin-left:      2px !important;
+    margin-right:     2px !important;
+    margin-top:       2px !important;
+    margin-bottom:    2px !important;
+    padding:          3px;
+    border-radius:    3px;
+    border:           1px solid darkblue;
+    color:            black;
+    background-color: lightgrey, 
+}
+
+.gzzdialog-header-item:checked {
+    margin-left:      2px !important;
+    margin-right:     2px !important;
+    margin-top:       2px !important;
+    margin-bottom:    2px !important;
+    padding:          3px;
+    border-radius:    3px;
+    border:           1px solid darkblue;
+    color:            black;
+    color:            cyan;
+    background-color: grey, 
+}
+
+.gzz-button {
+    margin-left:      2px;
+    margin-right:     2px;
+    margin-top:       2px;
+    margin-bottom:    2px;
+    padding:          3px;
+    border-radius:    3px;
+    border:           1px solid darkblue;
+    color:            black;
+    background-color: lightgrey, 
+}
+
+.gzzdialog-list-create-dir-button {
+    padding:          3px;
+    border-radius:    5px;
+    border:           1px solid darkblue;
+    cursor:           pointer;
+    outline:          none;
+    color:            black;
+    background-color: #b2b2b2; 
+    box-shadow:       0 6px #3e4444;
+}
+
+.gzzdialog-list-create-dir-button:hover {
+    background-color: #deeaee;
+    border:           1px solid blue;
+}
+
+.gzzdialog-list-create-dir-button:active {
+    border:           1px solid #b2b2b2;
+    color:            black;
+    background-color: #a2b9bc; 
+    border:           1px solid blue;
+    box-shadow:       0 3px #3c4141;
+    transform:        translateY(2px) !important;
+}
+
+.gzzdialog-list-item-button {
+    margin-left:      2px !important;
+    margin-right:     2px !important;
+    margin-top:       2px !important;
+    margin-bottom:    2px !important;
+    padding:          3px;
+    border-radius:    3px;
+    border:           1px solid darkblue;
+    color:            black;
+    background-color: lightgrey, 
+}
+
+.gzzdialog-list-item-button:checked {
+    margin-left:      2px !important;
+    margin-right:     2px !important;
+    margin-top:       2px !important;
+    margin-bottom:    2px !important;
+    padding:          3px;
+    border-radius:    3px;
+    border:           1px solid darkblue;
+    color:            cyan;
+    background-color: grey, 
+}
+
+.gzzdialog-file-row {
+    padding:          3px;
+    cursor:           pointer;
+    outline:          none;
+    color:            black;
+    background-color: #e6e2d3;
+}
+
+.gzzdialog-file-row:hover {
+    color:            darkcyan;
+    background-color: #f6f2c3;
+    box-shadow:       0 6px #3e4444;
+}
+
+.gzzdialog-file-row:active {
+    color:            darkcyan;
+    background-color: #f6f2c3;
+    box-shadow:       0 3px #3c4141;
+    transform:        translateY(2px) !important;
+}
+
+.dialog-list-item-elt {
+    padding-left:     3px;
+    padding-right:    3px;
+}

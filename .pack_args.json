@@ -1,0 +1,15 @@
+{
+  "schema": "schemas/org.gnome.shell.extensions.files-launcher.gschema.xml",
+  "extra-sources": [
+    "button.js",
+    "gzz.js",
+    "icon_constants.js",
+    "log_message.js",
+    "select.js"
+  ],
+  "out-dir": "/home/grizzlysmit/Projects/gnome-shell/extensions",
+  "force": true,
+  "gettext-domain": "files-launcher",
+  "podir": "po",
+  "package-dir": "files-launcher@grizzlysmit.smit.id.au"
+}

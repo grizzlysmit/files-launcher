@@ -1,0 +1,184 @@
+<schemalist gettext-domain="files-launcher">
+    <enum id="org.gnome.shell.extensions.files-launcher.area">
+        <value value="0" nick="left"/>
+        <value value="1" nick="center"/>
+        <value value="2" nick="right"/>
+    </enum>
+    <enum id="org.gnome.shell.extensions.files-launcher.page">
+        <value value="0" nick="settings"/>
+        <value value="1" nick="fileDisplay"/>
+        <value value="2" nick="filesIconsPage"/>
+        <value value="3" nick="filesScroller"/>
+        <value value="4" nick="editFileEntry"/>
+        <value value="5" nick="aboutPage"/>
+        <value value="6" nick="credits"/>
+    </enum>
+    <enum id="org.gnome.shell.extensions.files-launcher.time-type">
+        <value value="0" nick="None"/>
+        <value value="1" nick="Create"/>
+        <value value="2" nick="Modify"/>
+        <value value="3" nick="Crete-Modify"/>
+        <value value="4" nick="Access"/>
+        <value value="5" nick="Create-Access"/>
+        <value value="6" nick="Modify-Access"/>
+        <value value="7" nick="Create-Modify-Access"/>
+    </enum>
+    <enum id="org.gnome.shell.extensions.files-launcher.user-group">
+        <value value="0" nick="No-User-Group"/>
+        <value value="1" nick="User"/>
+        <value value="2" nick="Group"/>
+        <value value="3" nick="User-Group"/>
+    </enum>
+    <schema path="/org/gnome/shell/extensions/files-launcher/" id="org.gnome.shell.extensions.files-launcher">
+        <key name="area" enum="org.gnome.shell.extensions.files-launcher.area">
+            <default>'left'</default>
+            <summary>The panel area to place the button.</summary>
+            <description>Which area of the panel do we want to put the menu button, left centre or right.</description>
+        </key>
+        <key type="i" name="position">
+            <default>0</default>
+            <summary>The position in the area.</summary>
+            <description>The position to place the button in the area 0 to 25.</description>
+        </key>
+        <key type="i" name="show-messages">
+            <default>10</default>
+            <summary>Show or don't show logging.</summary>
+            <description>Show or don't show logging using console.log().</description>
+        </key>
+        <key type="i" name="window-width">
+            <default>925</default>
+            <summary>The window width.</summary>
+            <description>The users chosen window width (for the preferences).</description>
+        </key>
+        <key type="i" name="window-height">
+            <default>575</default>
+            <summary>The window height.</summary>
+            <description>The users chosen window height (for the preferences).</description>
+        </key>
+        <key name="page" enum="org.gnome.shell.extensions.files-launcher.page">
+            <default>'settings'</default>
+            <summary>The Page to open on.</summary>
+            <description>Open on this page when first called (part of the communication between the plugin and it's preferences).</description>
+        </key>
+        <key type="i" name="index">
+            <default>-1</default>
+            <summary>The index of the file to be edited.</summary>
+            <description>The index the file to be   edited is located at (part of the communication between the plugin and it's preferences).</description>
+        </key>
+        <key type="as" name="files">
+            <default>[]</default>
+            <summary>The files.</summary>
+            <description>The actual files.</description>
+        </key>
+        <key type="i" name="max-file-entry-length">
+            <default>8192</default>
+            <summary>The maximum length of a file entry.</summary>
+            <description>The the maximum length a file entry is alowed to be.</description>
+        </key>
+        <key type="b" name="edit-page">
+            <default>false</default>
+            <summary>Edit Page.</summary>
+            <description>Edit Page if true (part of the communication between the plugin and it's preferences).</description>
+        </key>
+        <key type="s" name="filespath">
+            <default>''</default>
+            <summary>Last path used.</summary>
+            <description>The path last used to save file to.</description>
+        </key>
+        <key type="s" name="filesname">
+            <default>'files.txt'</default>
+            <summary>Last name used.</summary>
+            <description>The name last used to save file to.</description>
+        </key>
+        <key type="s" name="filter">
+            <default>'/^(?:.*\\.txt|.*\\.files)$/i'</default>
+            <summary>Last filter used.</summary>
+            <description>The filter last used to view/save file to.</description>
+        </key>
+        <key type="i" name="double-click-time">
+            <default>800</default>
+            <summary>The maximum length of a file.</summary>
+            <description>The the maximum length a file is alowed to be.</description>
+        </key>
+        <key type="b" name="show-logs">
+            <default>false</default>
+            <summary>The maximum length of a file.</summary>
+            <description>The the maximum length a file is alowed to be.</description>
+        </key>
+        <key name="time-type" enum="org.gnome.shell.extensions.files-launcher.time-type">
+            <default>'Modify'</default>
+            <summary>The time fields to display.</summary>
+            <description>Display exactly these time fields.</description>
+        </key>
+        <key name="user-group" enum="org.gnome.shell.extensions.files-launcher.user-group">
+            <default>'No-User-Group'</default>
+            <summary>The user group fields to display.</summary>
+            <description>Display exactly these user group fields.</description>
+        </key>
+        <key type="b" name="display-inode">
+            <default>false</default>
+            <summary>The maximum length of a file.</summary>
+            <description>The the maximum length a file is alowed to be.</description>
+        </key>
+        <key type="b" name="display-mode">
+            <default>true</default>
+            <summary>The maximum length of a file.</summary>
+            <description>The the maximum length a file is alowed to be.</description>
+        </key>
+        <key type="b" name="display-number-links">
+            <default>false</default>
+            <summary>The maximum length of a file.</summary>
+            <description>The the maximum length a file is alowed to be.</description>
+        </key>
+        <key type="b" name="display-size">
+            <default>true</default>
+            <summary>The maximum length of a file.</summary>
+            <description>The the maximum length a file is alowed to be.</description>
+        </key>
+        <key type="i" name="icon-size">
+            <default>16</default>
+            <summary>The Icon Size.</summary>
+            <description>The Size for Icons.</description>
+        </key>
+        <key type="b" name="display-icon">
+            <default>false</default>
+            <summary>Show the icon above content.</summary>
+            <description>Display the little Icon above the content.</description>
+        </key>
+        <key type="b" name="base2-file-sizes">
+            <default>true</default>
+            <summary>Base 2 file sizes.</summary>
+            <description>Show the file sizes in base 2 (i.e. multiples of 2¹⁰, 2²⁰ etc).</description>
+        </key>
+        <key type="b" name="monochrome-icon">
+            <default>false</default>
+            <summary>Monochrome/Symbolic.</summary>
+            <description>Use Monochrome/Symbolic icons.</description>
+        </key>
+        <key type="i" name="menu-button-icon-size">
+            <default>25</default>
+            <summary>Menu Button Icon Size</summary>
+            <description>Change the Menu Button Icon Size.</description>
+        </key>
+        <key type="b" name="use-custom-icon">
+            <default>false</default>
+            <summary>Use Custom Icon</summary>
+            <description>Whether to use a custom icon or not.</description>
+        </key>
+        <key type="s" name="custom-icon-path">
+            <default>""</default>
+            <summary>Custom Icon Path</summary>
+            <description>Path to the custom icon image file.</description>
+        </key>
+        <key type="i" name="menu-button-icon-image">
+            <default>0</default>
+            <summary>Menu Button Icon Image</summary>
+            <description>Change the Menu Button Icon Image.</description>
+        </key>
+        <key type="b" name="hide-icon-shadow">
+            <default>false</default>
+            <summary>Toggle visibility of the top panel icon's shadow </summary>
+            <description>Toggle visibility of the top panel icon's shadow.</description>
+        </key>
+    </schema>
+</schemalist>

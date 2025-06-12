@@ -1,0 +1,461 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-06-09 02:42+1000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: prefs.js:53 prefs.js:477
+msgid "Exit Settings"
+msgstr ""
+
+#: prefs.js:112
+msgid "Monochrome Icons"
+msgstr "Monochrome Icons"
+
+#: prefs.js:116
+msgid "Coloured Icons"
+msgstr "Coloured Icons"
+
+#: prefs.js:120
+msgid "Icon Settings"
+msgstr "Icon Settings"
+
+#: prefs.js:194
+msgid "Icon Size"
+msgstr "Icon Size"
+
+#: prefs.js:228
+msgid "Hide Icon Shadow"
+msgstr "Hide Icon Shadow"
+
+#: prefs.js:245
+msgid "Use Custom Icon"
+msgstr "Use Custom Icon"
+
+#: prefs.js:268
+msgid "Selected Icon"
+msgstr "Selected Icon"
+
+#: prefs.js:311
+msgid "Select a Custom Icon"
+msgstr "Select a Custom Icon"
+
+#: prefs.js:356
+msgid "About"
+msgstr "About"
+
+#: prefs.js:362
+msgid "Launch files from a menu."
+msgstr "Launch files from a menu."
+
+#: prefs.js:363
+msgid "A menu full of files to launch 🤠."
+msgstr "A menu full of files to launch 🤠."
+
+#: prefs.js:396
+msgid "Files with history Version"
+msgstr "Files with history Version"
+
+#: prefs.js:406
+msgid "Git Commit"
+msgstr "Git Commit"
+
+#: prefs.js:416
+msgid "GNOME Version"
+msgstr "GNOME Version"
+
+#: prefs.js:425
+msgid "OS Name"
+msgstr "OS Name"
+
+#: prefs.js:438
+msgid "Windowing System"
+msgstr "Windowing System"
+
+#: prefs.js:446
+msgid "Files with history Github"
+msgstr "Files with history Github"
+
+#: prefs.js:524
+msgid "Area in the panel"
+msgstr "Area in the panel"
+
+#: prefs.js:526
+msgid "Left"
+msgstr "Left"
+
+#: prefs.js:526
+msgid "Center"
+msgstr "Center"
+
+#: prefs.js:526
+msgid "Right"
+msgstr "Right"
+
+#: prefs.js:544
+msgid "Position"
+msgstr "Position"
+
+#: prefs.js:546
+msgid "Position in the area of the panel."
+msgstr "Position in the area of the panel."
+
+#: prefs.js:565
+msgid "Double Click Time"
+msgstr "Double Click Time"
+
+#: prefs.js:567
+msgid "Double click time for mouse clicks in milli seconds."
+msgstr "Double click time for mouse clicks in milli seconds."
+
+#: prefs.js:588
+msgid "Show Files"
+msgstr "Show Files"
+
+#: prefs.js:626
+msgid "Maximum length of a File."
+msgstr "Maximum length of a File."
+
+#: prefs.js:627
+msgid "The maximum length allowed for a file"
+msgstr "The maximum length allowed for a file"
+
+#: prefs.js:638
+msgid "Show logs for debugging."
+msgstr "Show logs for debugging."
+
+#: prefs.js:639
+msgid ""
+"Turn on the logging for this plugin if you don't know what this is the leave "
+"it off."
+msgstr "Turn on the logging for this plugin if you don't know what this is the leave "
+"it off."
+
+#: prefs.js:671
+msgid "Size of Icons."
+msgstr "Size of Icons."
+
+#: prefs.js:672
+msgid "The Size of the icons in the dialogs"
+msgstr "The Size of the icons in the dialogs"
+
+#: prefs.js:730
+msgid "Diplay these time types"
+msgstr "Diplay these time types"
+
+#: prefs.js:733
+msgid "None"
+msgstr "None"
+
+#: prefs.js:733 gzz.js:1493
+msgid "Create"
+msgstr "Create"
+
+#: prefs.js:733
+msgid "Modify"
+msgstr "Modify"
+
+#: prefs.js:734
+msgid "Crete+Modify"
+msgstr "Crete+Modify"
+
+#: prefs.js:734
+msgid "Access"
+msgstr "Access"
+
+#: prefs.js:735
+msgid "Create+Access"
+msgstr "Create+Access"
+
+#: prefs.js:735
+msgid "Modify+Access"
+msgstr "Modify+Access"
+
+#: prefs.js:736
+msgid "Create+Modify+Access"
+msgstr "Create+Modify+Access"
+
+#: prefs.js:757
+msgid "Display Inode."
+msgstr "Display Inode."
+
+#: prefs.js:758
+msgid "Diplay the Inode number."
+msgstr "Diplay the Inode number."
+
+#: prefs.js:770
+msgid "Diplay User and or Group"
+msgstr "Diplay User and or Group"
+
+#: prefs.js:772
+msgid "No-User-Group"
+msgstr "No-User-Group"
+
+#: prefs.js:772 gzz.js:1535
+msgid "User"
+msgstr "User"
+
+#: prefs.js:772 gzz.js:1547
+msgid "Group"
+msgstr "Group"
+
+#: prefs.js:772
+msgid "User+Group"
+msgstr "User+Group"
+
+#: prefs.js:792
+msgid "Display Perms."
+msgstr "Display Perms."
+
+#: prefs.js:793
+msgid "Diplay the Permissions and File Type."
+msgstr "Diplay the Permissions and File Type."
+
+#: prefs.js:807
+msgid "Display number of links."
+msgstr "Display number of links."
+
+#: prefs.js:808
+msgid "Diplay the number of hard links."
+msgstr "Diplay the number of hard links."
+
+#: prefs.js:822
+msgid "Display File Size."
+msgstr "Display File Size."
+
+#: prefs.js:823
+msgid "Diplay the File Size in Terra Bytes, Giga Bytes etc..."
+msgstr "Diplay the File Size in Terra Bytes, Giga Bytes etc..."
+
+#: prefs.js:837
+msgid "Base 2 file sizes."
+msgstr "Base 2 file sizes."
+
+#: prefs.js:838
+msgid "Show the file sizes in base 2 (i.e. multiples of 2¹⁰, 2²⁰ etc)."
+msgstr "Show the file sizes in base 2 (i.e. multiples of 2¹⁰, 2²⁰ etc)."
+
+#: prefs.js:850
+msgid "filter"
+msgstr "filter"
+
+#: prefs.js:898 prefs.js:910
+msgid "Insert File..."
+msgstr "Insert File..."
+
+#: prefs.js:1015
+msgid "Add text"
+msgstr "Add text"
+
+#: prefs.js:1027 extension.js:172 gzz.js:507 gzz.js:3263
+msgid "Cancel"
+msgstr "Cancel"
+
+#: prefs.js:1033
+msgid "Restart"
+msgstr "Restart"
+
+#: prefs.js:1039
+msgid "delete"
+msgstr "delete"
+
+#: prefs.js:1044 extension.js:202 gzz.js:3255
+msgid "Save"
+msgstr "Save"
+
+#: prefs.js:1045
+msgid "Save & Exit"
+msgstr "Save & Exit"
+
+#: prefs.js:1047
+msgid "Insert"
+msgstr "Insert"
+
+#: prefs.js:1048
+msgid "Insert & Exit"
+msgstr "Insert & Exit"
+
+#: prefs.js:1252
+msgid "Copyright"
+msgstr "Copyright"
+
+#: prefs.js:1261
+msgid "Author"
+msgstr "Author"
+
+#: prefs.js:1314
+msgid "Settings"
+msgstr "Settings"
+
+#: prefs.js:1315
+msgid "File Display Settings"
+msgstr "File Display Settings"
+
+#: prefs.js:1316
+msgid "Icon"
+msgstr "Icon"
+
+#: prefs.js:1317
+msgid "Files"
+msgstr "Files"
+
+#: prefs.js:1318
+msgid "Edit file"
+msgstr "Edit file"
+
+#: prefs.js:1320
+msgid "Credits"
+msgstr "Credits"
+
+#: extension.js:165 extension.js:271
+msgid "Edit File"
+msgstr "Edit File"
+
+#: extension.js:166 extension.js:272
+msgid "Edit or view File."
+msgstr "Edit or view File."
+
+#: extension.js:182
+msgid "Delete"
+msgstr "Delete"
+
+#: extension.js:231
+msgid "Are you sure"
+msgstr "Are you sure"
+
+#: extension.js:236
+msgid "Yes"
+msgstr "Yes"
+
+#: extension.js:246
+msgid "No"
+msgstr "No"
+
+#: extension.js:273
+msgid "Add File"
+msgstr "Add File"
+
+#: extension.js:337
+msgid "Files Launcher"
+msgstr "Files Launcher"
+
+#: extension.js:387
+msgid "Save messages as file"
+msgstr "Save messages as file"
+
+#: extension.js:535
+msgid "Actions"
+msgstr "Actions"
+
+#: extension.js:537
+msgid "Save to file..."
+msgstr "Save to file..."
+
+#: extension.js:541
+msgid "Load from file..."
+msgstr "Load from file..."
+
+#: extension.js:545
+msgid "Add File..."
+msgstr "Add File..."
+
+#: extension.js:551
+msgid "Preferences & About"
+msgstr "Preferences & About"
+
+#: extension.js:555
+msgid "Settings..."
+msgstr "Settings..."
+
+#: extension.js:559
+msgid "File Display Settings..."
+msgstr "File Display Settings..."
+
+#: extension.js:563
+msgid "Icon Settings..."
+msgstr "Icon Settings..."
+
+#: extension.js:567
+msgid "Files Scroller..."
+msgstr "Files Scroller..."
+
+#: extension.js:570
+msgid "About..."
+msgstr "About..."
+
+#: extension.js:573
+msgid "Credits..."
+msgstr "Credits..."
+
+#: gzz.js:430 select.js:161
+msgid "start typing text here."
+msgstr "start typing text here."
+
+#: gzz.js:487
+msgid "OK"
+msgstr "OK"
+
+#: gzz.js:1434
+msgid "Inode Number"
+msgstr "Inode Number"
+
+#: gzz.js:1450
+msgid "Permisions"
+msgstr "Permisions"
+
+#: gzz.js:1466
+msgid "#Link"
+msgstr "#Link"
+
+#: gzz.js:1476
+msgid "File Name"
+msgstr "File Name"
+
+#: gzz.js:1505
+msgid "Modification Time"
+msgstr "Modification Time"
+
+#: gzz.js:1517
+msgid "Access Time"
+msgstr "Access Time"
+
+#: gzz.js:1563
+msgid "File Size"
+msgstr "File Size"
+
+#: gzz.js:1844
+msgid "Filter: "
+msgstr "Filter: "
+
+#: gzz.js:1851
+msgid "Name: "
+msgstr "Name: "
+
+#: gzz.js:3258
+msgid "Open"
+msgstr "Open"
+
+#: gzz.js:3259
+msgid "folder-open"
+msgstr "folder-open"
+
+#: gzz.js:4050 gzz.js:4052
+msgid "Make Directory"
+msgstr "Make Directory"
+
+#: gzz.js:4051
+msgid "Type a new name for the new directory."
+msgstr "Type a new name for the new directory."

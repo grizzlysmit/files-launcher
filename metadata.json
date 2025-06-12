@@ -1,0 +1,13 @@
+{
+  "name": "files-launcher",
+  "description": "files-launcher is a menu that allows you to launch arbitary files options are view, edit or run (if it is an executable), you can also put directories in it and then the options will be list, open in the default File Browser, or in the default shell 🤠.",
+  "uuid": "files-launcher@grizzlysmit.smit.id.au",
+  "credits": "(C) Francis Grizzly Smit 🤠\n\nLicence GPL v3+",
+  "gettext-domain": "files-launcher",
+  "settings-schema": "org.gnome.shell.extensions.files-launcher",
+  "url": "https://github.com/grizzlysmit/files-launcher",
+  "shell-version": [
+    "48"
+  ],
+  "version": 1
+}
