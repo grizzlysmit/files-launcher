@@ -36,6 +36,7 @@ import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as LogMessage from './log_message.js';
 import * as Constants from './icon_constants.js';
+import('gi://GioUnix?version=2.0').catch(() => {}); // Set version for optional dependency //
 
 class ApplicationMenuItem extends PopupMenu.PopupBaseMenuItem {
     static {
@@ -161,8 +162,31 @@ class ApplicationMenuItem extends PopupMenu.PopupBaseMenuItem {
     }
 
     activate(event) {
-        let t        = typeof event;
-        LogMessage.log_message(LogMessage.get_prog_id(), `ApplicationMenuItem::activate: event == ‷${event}‴ of type ‷${t}‴.`, new Error());
+        let t = null;
+        const LM = LogMessage;
+        const id = LogMessage.get_prog_id();
+        //t        = typeof _self;
+        //LM.log_message(id, `ApplicationMenuItem::activate: _self == ‷${_self}‴ of type ‷${t}‴.`, new Error());
+        t        = typeof event;
+        LM.log_message(id, `ApplicationMenuItem::activate: event == ‷${event}‴ of type ‷${t}‴.`, new Error());
+        /*
+        if(Array.isArray(event)){
+            event = event.map(elt => elt instanceof Clutter.Event);
+            t        = typeof event;
+            LM.log_message(
+                id, `ApplicationMenuItem::activate: event == ‷${event}‴ of type ‷${t}‴.`, new Error()
+            );
+            if(Array.isArray(event)){
+                event = event[0];
+                t        = typeof event;
+                LM.log_message(
+                    id, `ApplicationMenuItem::activate: event == ‷${event}‴ of type ‷${t}‴.`, new Error()
+                );
+            }
+        }
+        t        = typeof event;
+        LM.log_message(id, `ApplicationMenuItem::activate: event == ‷${event}‴ of type ‷${t}‴.`, new Error());
+        // */
         super.activate(event);
         let dlg         = null;
         const index     = this._item.index;

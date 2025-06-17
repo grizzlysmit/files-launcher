@@ -933,10 +933,12 @@ class FilesScroller extends PageBase {
                     page_size:      0,
                     value:          _index, 
                 }),
-                climb_rate: 1,
-                digits: 0,
-                numeric:    true, 
-                valign: Gtk.Align.CENTER,
+                climb_rate:         1,
+                activates_default:  Gtk.SpinButtonUpdatePolicy.IF_VALID, 
+                digits:             0,
+                numeric:            true, 
+                css_name:           'updown-spin', 
+                valign:             Gtk.Align.CENTER,
             });
             const button = new Gtk.Button({
                                 label: ">...",
@@ -999,10 +1001,11 @@ class FilesScroller extends PageBase {
                     page_size:      0,
                     value:          _index, 
                 }),
-                climb_rate: 1,
-                digits: 0,
-                numeric:    true, 
-                valign: Gtk.Align.CENTER,
+                climb_rate:         1,
+                digits:             0,
+                numeric:            true, 
+                css_name:           'updown-spin', 
+                valign:             Gtk.Align.CENTER,
             });
             const button = new Gtk.Button({
                                 label: ">...",

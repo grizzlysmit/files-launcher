@@ -15,8 +15,8 @@ import * as ModalDialog from 'resource:///org/gnome/shell/ui/modalDialog.js';
 import GObject from 'gi://GObject';
 import GLib from 'gi://GLib';
 import Gio from 'gi://Gio';
-import GioUnix from 'gi://GioUnix';
-/*
+//import GioUnix from 'gi://GioUnix';
+//*
 // Retain compatibility with GLib < 2.80, which lacks GioUnix
 let GioUnix;
 try {
@@ -136,34 +136,35 @@ export function unixPermsToStr(file_type, perms, path){
     }else if(file_type == Gio.FileType.DIRECTORY){
         result += 'd';
     }else if(file_type == Gio.FileType.SPECIAL){
-        result += '|';
-        /* cannot use GLib.lstat just now    //
-        // no way to allocate a GLib.StatBuf //
-        //let buf = new GLib.StatBuf();
-        let buf = {};
-        if(GLib.lstat(path, buf) === 0){
-            const filetype = buf['st_mode'] & 0o0170000;
-            switch(filetype){
-                case 0o0140000:  // Socket //
-                    result += 'S';
-                    break;
-                case 0o0060000: // Block Special //
-                    result += 'b';
-                    break;
-                case 0o0020000: // Character Special //
-                    result += 'c';
-                    break;
-                case 0o0010000: // FIFO //
-                    result += '|';
-                    break;
-                case 0o0120000: // Symbolic Link //
-                    result += 'l';
-                    break;
-                case 0o0100000: // Regular File //
-                    result += '.';
-                    break;
-            } // switch(filetype) //
-        } // if(GLib.lstat(path, buf) === 0) //
+        //result += '|';
+        try {
+            const [ok, type_, subtype, _params, ] = mime_type(path, false);
+            //* cannot use GLib.lstat just now    //
+            // no way to allocate a GLib.StatBuf //
+            //let buf = new GLib.StatBuf();
+            //let buf = {};
+            //if(GLib.lstat(path, buf) === 0)
+            if(ok && type_ === 'inode'){
+                //const filetype = buf['st_mode'] & 0o0170000;
+                switch(subtype){
+                    case 'socket':  // Socket //
+                        result += 'S';
+                        break;
+                    case 'blockdevice': // Block Special //
+                        result += 'b';
+                        break;
+                    case 'chardevice': // Character Special //
+                        result += 'c';
+                        break;
+                    case 'fifo': // FIFO //
+                        result += '|';
+                        break;
+                } // switch(subtype) //
+            } // if(ok && type_ == 'inode') //
+        }catch(e){
+            LogMessage.log_message(LogMessage.get_prog_id(), `export function unixPermsToStr:  Error: ${e}`, e);
+            result += '|';
+        }
         // */
     }else if(file_type == Gio.FileType.REGULAR){
         result += '.';
@@ -408,9 +409,15 @@ export function fileData(file) {
     }
 } // export function fileData(file_) //
 
-export function mime_type(file) {
+export function mime_type(file, dereference = true) {
+    if(file instanceof Gio.File) file = file.get_path();
+    const cmd = [ 'file', '--brief', ];
+    if(dereference) {
+        cmd.push('--dereference');
+    }
+    cmd.push( '--mime-type', file );
     const [ child_pid, standard_input, standard_out, standard_error] = Shell.util_spawn_async_with_pipes(null,
-                                [ 'file', '--brief', '--dereference',  '--mime-type', file  ],
+                                cmd,
                                 null,
                                 GLib.SpawnFlags.SEARCH_PATH
                             );
@@ -441,10 +448,10 @@ export function mime_type(file) {
             }else{
                 return [ true, buff, null, null, ];
             }
-        }
-    }
+        } // if(buff) //
+    } // if(child_pid && standard_out != null) //
     return [ false, null, null, null, ];
-} //  export function mime_type(file) //
+} //  export function mime_type(file, dereference = true) //
 
 export class GzzMessageDialog extends ModalDialog.ModalDialog {
     static {
@@ -965,6 +972,7 @@ export class GzzFileDialogBase extends ModalDialog.ModalDialog {
         throw new Error('GzzFileDialogBase::display_dir_error: Cannot create an instace of a virtual class.');
     }
 
+    /*
     double_clicked(_error_owner, _title){
         throw new Error('GzzFileDialogBase::double_clicked_error: Cannot create an instace of a virtual class.');
     }
@@ -972,6 +980,7 @@ export class GzzFileDialogBase extends ModalDialog.ModalDialog {
     clicked(_error_owner, _title){
         throw new Error('GzzFileDialogBase::clicked_error: Cannot create an instace of a virtual class.');
     }
+    // */
 
 } // export class GzzFileDialogBase extends ModalDialog.ModalDialog  //
 
@@ -1421,15 +1430,21 @@ export class GzzHeader extends AbstractHeader {
             const [ok, array] = splitFile(file);
             if(!ok){
                 LogMessage.log_message(LogMessage.get_prog_id(), `GzzHeader::set_dir_path: array == ${array}`, new Error());
-                this.#_owner.apply_error_handler(this, 'GzzHeader::add_button_error', `splitFile Error: ${array}`, new Error());
+                this.#_owner.apply_error_handler(
+                    this, 'GzzHeader::add_button_error', `splitFile Error: ${array}`, new Error()
+                );
                 return;
             }
             this.#_current_array = array;
-            LogMessage.log_message(LogMessage.get_prog_id(), `GzzHeader::set_show_root: this.#_current_array == ${JSON.stringify(this.#_current_array)}`, new Error());
-            LogMessage.log_message(LogMessage.get_prog_id(), `GzzHeader::set_dir_path: array == ${JSON.stringify(array)}`, new Error());
-            LogMessage.log_message(LogMessage.get_prog_id(), `GzzHeader::set_dir_path: this.#_array == ${JSON.stringify(this.#_array)}`, new Error());
-            LogMessage.log_message(LogMessage.get_prog_id(), `GzzHeader::set_dir_path: array.length == ${array.length}`, new Error());
-            LogMessage.log_message(LogMessage.get_prog_id(), `GzzHeader::set_dir_path: this.#_array.length == ${this.#_array.length}`, new Error());
+            const LM = LogMessage;
+            const id = LM.get_prog_id();
+            LM.log_message(
+                id, `GzzHeader::set_show_root: this.#_current_array == ${JSON.stringify(this.#_current_array)}`, new Error()
+            );
+            LM.log_message(id, `GzzHeader::set_dir_path: array == ${JSON.stringify(array)}`, new Error());
+            LM.log_message(id, `GzzHeader::set_dir_path: this.#_array == ${JSON.stringify(this.#_array)}`, new Error());
+            LM.log_message(id, `GzzHeader::set_dir_path: array.length == ${array.length}`, new Error());
+            LM.log_message(id, `GzzHeader::set_dir_path: this.#_array.length == ${this.#_array.length}`, new Error());
             if(subpathof(array, this.#_array)){
                 this.refresh_button_states();
                 this.#_list_file_section.list_destroy_all_children(this);
@@ -1442,7 +1457,9 @@ export class GzzHeader extends AbstractHeader {
                 this.#_owner.display_dir(this, file);
             }
         }else{
-            LogMessage.log_message(LogMessage.get_prog_id(), 'GzzHeader::set_dir_path file error: file must have a value:', new Error());
+            LogMessage.log_message(
+                LogMessage.get_prog_id(), 'GzzHeader::set_dir_path file error: file must have a value:', new Error()
+            );
             this.#_owner.apply_error_handler(
                 this,
                 'GzzHeader::set_dir_path',
@@ -2025,7 +2042,10 @@ export  class GzzListFileSection extends AbstractListFileSection {
 
         this.#show_root_button.connect('clicked', () => {
             const showroot = !this.#header.get_show_root();
-            LogMessage.log_message(LogMessage.get_prog_id(), `GzzListFileSection::constructor: this.#show_root_button.connect showroot == ${showroot}`, new Error());
+            LogMessage.log_message(
+                LogMessage.get_prog_id(),
+                `GzzListFileSection::constructor: this.#show_root_button.connect showroot == ${showroot}`, new Error()
+            );
             this.#header.set_show_root(showroot) 
             this.#show_root_button.checked = showroot;
         })
@@ -2468,17 +2488,19 @@ export class GzzListFileRow extends St.BoxLayout {
                 'clicked': {
                     flags: GObject.SignalFlags.RUN_LAST,
                     param_types: [
-                        GObject.TYPE_OBJECT,
+                        GObject.TYPE_STRING,
                         GObject.TYPE_UINT,
                         Clutter.ModifierType.$gtype,
+                        GObject.TYPE_STRING,
                     ],
                 },
                 'dblclick': {
                     flags: GObject.SignalFlags.RUN_LAST,
                     param_types: [
-                        GObject.TYPE_OBJECT,
+                        GObject.TYPE_STRING,
                         GObject.TYPE_UINT,
                         Clutter.ModifierType.$gtype,
+                        GObject.TYPE_STRING,
                     ],
                 },
             },
@@ -2495,6 +2517,7 @@ export class GzzListFileRow extends St.BoxLayout {
     #_inode                = null;
     #_file_type            = Gio.FileType.UNKNOWN;
     #_file                 = GLib.get_home_dir();
+    #_dir                  = GLib.get_home_dir();
     #_mode                 = '.---------';
     #_raw_mode             = 0;
     #_mode_box             = null;
@@ -2608,7 +2631,20 @@ export class GzzListFileRow extends St.BoxLayout {
                 this.#_file = params.file.get_path();
             }
         }
-        LogMessage.log_message(LogMessage.get_prog_id(), `GzzListFileRow::constructor: this.#_file == ${this.#_file}`, new Error());
+        LogMessage.log_message(
+            LogMessage.get_prog_id(), `GzzListFileRow::constructor: this.#_file == ${this.#_file}`, new Error()
+        );
+        
+        if('dir' in params){
+            if(params.dir instanceof String || typeof params.dir === 'string'){
+                this.#_dir = params.dir.toString();
+            }else if(params.dir instanceof Gio.File){
+                this.#_dir = params.dir.get_path();
+            }
+        }
+        LogMessage.log_message(
+            LogMessage.get_prog_id(), `GzzListFileRow::constructor: this.#_dir == ${this.#_dir}`, new Error()
+        );
 
         if('mode' in params && Number.isInteger(params.mode)){
             this.#_raw_mode = params.mode;
@@ -2661,11 +2697,22 @@ export class GzzListFileRow extends St.BoxLayout {
 
         LogMessage.log_message(LogMessage.get_prog_id(), `GzzListFileRow::constructor: this.#_file_type == ‷${this.#_file_type}‴`, new Error());
         LogMessage.log_message(
-            LogMessage.get_prog_id(), `GzzListFileRow::constructor: this.#_symlink_target == ‷${this.#_symlink_target}‴`, new Error()
+            LogMessage.get_prog_id(),
+            `GzzListFileRow::constructor: this.#_symlink_target == ‷${this.#_symlink_target}‴`, new Error()
         );
 
+        let title = '';
+
+        if(this.#_the_title){
+            try {
+                title = this.#decorateFileName(this.#_the_title);
+            } catch(e){
+                LogMessage.log_message(LogMessage.get_prog_id(), `GzzListFileRow::constructor: Error: ‷${e}‴`, e);
+            }
+        }
+
         this.#_title = new St.Label({
-            text:        this.#decorateFileName(this.#_the_title), 
+            text:        title, 
             style_class: 'dialog-list-item-elt',
             x_expand:    true,
             x_align:     Clutter.ActorAlign.FILL, 
@@ -2819,16 +2866,28 @@ export class GzzListFileRow extends St.BoxLayout {
             this.set_double_click_time(params.double_click_time);
         }
         this.click_count = 0;
-        this.#connectID_press   = this.connect("button-press-event", (actor, event) => { this.handle_button_press_event(actor, event); });
-        this.#connectID_release = this.connect("button-release-event", (actor, event) => { this.handle_button_release_event(actor, event); });
+        this.#connectID_press   = this.connect("button-press-event", (actor, event) => {
+            this.handle_button_press_event(actor, event);
+        });
+        this.#connectID_release = this.connect("button-release-event", (actor, event) => {
+            this.handle_button_release_event(actor, event, this.#_the_title, this.#_dir);
+        });
         this.#connectID_enter   = this.connect('enter-event', () => {
             LogMessage.log_message(LogMessage.get_prog_id(), 'GzzListFileRow::enter-event:  hovering', new Error());
-            this.add_style_pseudo_class('hover');
+            try {
+                this.add_style_pseudo_class('hover');
+            } catch(e){
+                LogMessage.log_message(LogMessage.get_prog_id(), `GzzListFileRow::enter-event:  Error: ${e}`, e);
+            }
             return Clutter.EVENT_PROPAGATE;
         });
         this.#connectID_leave   = this.connect('leave-event', () => {
             LogMessage.log_message(LogMessage.get_prog_id(), 'GzzListFileRow::leave-event:  no longer hovering', new Error());
-            this.remove_style_pseudo_class('hover');
+            try {
+                this.remove_style_pseudo_class('hover');
+            } catch(e){
+                LogMessage.log_message(LogMessage.get_prog_id(), `GzzListFileRow::leave-event:  Error: ${e}`, e);
+            }
             return Clutter.EVENT_PROPAGATE;
         });
     } // constructor(params) //
@@ -2842,6 +2901,7 @@ export class GzzListFileRow extends St.BoxLayout {
     static Group         = 0b00010;
 
     #decorateFileName(filename){
+        filename = filename.replace(/\/+$/, '');
         LogMessage.log_message(LogMessage.get_prog_id(), `GzzListFileRow::#decorateFileName: filename == ‷${filename}‴`, new Error());
         LogMessage.log_message(
             LogMessage.get_prog_id(), `GzzListFileRow::#decorateFileName: this.#_file_type == ‷${this.#_file_type}‴`, new Error()
@@ -2856,7 +2916,7 @@ export class GzzListFileRow extends St.BoxLayout {
             }else if(this.#_symlink_mode & 0b001_001_001){
                 spec = '*';
             }
-            return filename + ' -> ' + this.#_symlink_target + spec;
+            return filename + ' -> ' + this.#_symlink_target.replace(/\/+$/, '') + spec;
         }else if(this.#_file_type == Gio.FileType.DIRECTORY){
             return filename + '/';
             /*
@@ -2869,7 +2929,31 @@ export class GzzListFileRow extends St.BoxLayout {
             }
             // */
         }else if(this.#_file_type == Gio.FileType.SPECIAL){
-            return filename + '|';
+            //return filename + '?';
+            //*
+            try {
+                //throw new Error("Dummy 1");
+                const file_ = this.#_file;
+                const file  = `${file_}`;
+                const [ok, type_, subtype, _params, ] = mime_type(file, false);
+                if(ok && type_ === 'inode'){
+                    //const filetype = buf['st_mode'] & 0o0170000;
+                    switch(subtype){
+                        case 'socket':  // Socket //
+                            return filename + '=';
+                        case 'blockdevice': // Block Special //
+                            return filename;
+                        case 'chardevice': // Character Special //
+                            return filename;
+                        case 'fifo': // FIFO //
+                            return filename + '|';
+                    } // switch(subtype) //
+                } // if(ok && type_ == 'inode') //
+            } catch(e){
+                LogMessage.log_message(LogMessage.get_prog_id(), `GzzListFileRow::decorateFileName:  Error: ${e}`, e);
+                return filename + '?';
+            }
+            // */
             /* cannot use GLib.lstat just now    //
             // no way to allocate a GLib.StatBuf //
             //let buf = new GLib.StatBuf();
@@ -2950,92 +3034,141 @@ export class GzzListFileRow extends St.BoxLayout {
         } //switch(event.get_button()) //
     } // handle_button_press_event(actor, event) //
 
-    handle_button_release_event(actor, event){
-        let button_time_ = null;
-        let button_double_time_ = null;
-        let now = 0
-        switch(event.get_button()){
-            case(1):
-                LogMessage.log_message(
-                    LogMessage.get_prog_id(),
-                    `GzzListFileRow::handle_button_release_event: button == ${event.get_button()}`,
-                    new Error()
-                );
-                now = new Date().valueOf();
-                LogMessage.log_message(LogMessage.get_prog_id(), `GzzListFileRow::handle_button_press_event: this.click_event_start == ${this.click_event_start}`, new Error());
-                button_time_ = now - this.click_event_start;
-                LogMessage.log_message(
-                    LogMessage.get_prog_id(),
-                    `GzzListFileRow::handle_button_release_event: this.double_click_start == ${this.double_click_start}`,
-                    new Error()
-                );
-                button_double_time_ = now - this.double_click_start;
-                LogMessage.log_message(LogMessage.get_prog_id(), `GzzListFileRow::handle_button_release_event: now == ${now}`, new Error());
-                LogMessage.log_message(
-                    LogMessage.get_prog_id(),
-                    `GzzListFileRow::handle_button_release_event: button_time_ == ${button_time_}`, new Error()
-                );
-                LogMessage.log_message(
-                    LogMessage.get_prog_id(),
-                    `GzzListFileRow::handle_button_release_event: button_double_time_ == ${button_double_time_}`,
-                    new Error()
-                );
-                LogMessage.log_message(
-                    LogMessage.get_prog_id(),
-                    `GzzListFileRow::handle_button_release_event: this.#_double_click_time == ${this.#_double_click_time}`,
-                    new Error()
-                );
-                LogMessage.log_message(
-                    LogMessage.get_prog_id(),
-                    'GzzListFileRow::handle_button_release_event:' 
-                        + ' button_time_ > 0 && button_double_time_ < this.#_double_click_time == ' 
-                            + `${button_time_ > 0 && button_double_time_ < this.#_double_click_time}`, 
-                    new Error()
-                );
-                if(button_time_ > 0 && button_double_time_ < this.#_double_click_time){
-                    this.click_count++;
-                    if(this.click_count >= 2){
-                        this.click_event_start = null;
-                    }
+    handle_button_release_event(actor, event, directory_filename, path){
+        try {
+            LogMessage.log_message(
+                LogMessage.get_prog_id(), `GzzListFileRow::handle_button_release_event: actor == ${actor}`, new Error()
+            );
+            LogMessage.log_message(
+                LogMessage.get_prog_id(), `GzzListFileRow::handle_button_release_event: event == ${event}`, new Error()
+            );
+            LogMessage.log_message(
+                LogMessage.get_prog_id(),
+                `GzzListFileRow::handle_button_release_event: directory_filename == ${directory_filename}`, new Error()
+            );
+            LogMessage.log_message(
+                LogMessage.get_prog_id(), `GzzListFileRow::handle_button_release_event: path == ${path}`, new Error()
+            );
+            let button_time_        = null;
+            let button_double_time_ = null;
+            let now                 = 0
+            switch(event.get_button()){
+                case(1):
                     LogMessage.log_message(
                         LogMessage.get_prog_id(),
-                        `GzzListFileRow::handle_button_release_event: this.click_count == ${this.click_count}`,
+                        `GzzListFileRow::handle_button_release_event: button == ${event.get_button()}`,
                         new Error()
                     );
-                    LogMessage.log_message(LogMessage.get_prog_id(), `GzzListFileRow::handle_button_release_event: this.#_is_dir == ${this.#_is_dir}`, new Error());
-                    LogMessage.log_message(LogMessage.get_prog_id(), `GzzListFileRow::handle_button_release_event: now == ${now}`, new Error());
-                    if(this.#_is_dir){
+                    now = new Date().valueOf();
+                    LogMessage.log_message(
+                        LogMessage.get_prog_id(),
+                        `GzzListFileRow::handle_button_press_event: this.click_event_start == ${this.click_event_start}`,
+                        new Error()
+                    );
+                    button_time_ = now - this.click_event_start;
+                    LogMessage.log_message(
+                        LogMessage.get_prog_id(),
+                        `GzzListFileRow::handle_button_release_event: this.double_click_start == ${this.double_click_start}`,
+                        new Error()
+                    );
+                    button_double_time_ = now - this.double_click_start;
+                    LogMessage.log_message(
+                        LogMessage.get_prog_id(), `GzzListFileRow::handle_button_release_event: now == ${now}`, new Error()
+                    );
+                    LogMessage.log_message(
+                        LogMessage.get_prog_id(),
+                        `GzzListFileRow::handle_button_release_event: button_time_ == ${button_time_}`, new Error()
+                    );
+                    LogMessage.log_message(
+                        LogMessage.get_prog_id(),
+                        `GzzListFileRow::handle_button_release_event: button_double_time_ == ${button_double_time_}`,
+                        new Error()
+                    );
+                    LogMessage.log_message(
+                        LogMessage.get_prog_id(),
+                        `GzzListFileRow::handle_button_release_event: this.#_double_click_time == ${this.#_double_click_time}`,
+                        new Error()
+                    );
+                    LogMessage.log_message(
+                        LogMessage.get_prog_id(),
+                        'GzzListFileRow::handle_button_release_event:' 
+                            + ' button_time_ > 0 && button_double_time_ < this.#_double_click_time == ' 
+                                + `${button_time_ > 0 && button_double_time_ < this.#_double_click_time}`, 
+                        new Error()
+                    );
+                    if(button_time_ > 0 && button_double_time_ < this.#_double_click_time){
+                        this.click_count++;
                         if(this.click_count >= 2){
-                            this.click_event_start = this.double_click_start = null;
+                            this.click_event_start = null;
+                        }
+                        LogMessage.log_message(
+                            LogMessage.get_prog_id(),
+                            `GzzListFileRow::handle_button_release_event: this.click_count == ${this.click_count}`,
+                            new Error()
+                        );
+                        LogMessage.log_message(
+                            LogMessage.get_prog_id(),
+                            `GzzListFileRow::handle_button_release_event: this.#_is_dir == ${this.#_is_dir}`, new Error()
+                        );
+                        LogMessage.log_message(
+                            LogMessage.get_prog_id(),
+                            `GzzListFileRow::handle_button_release_event: now == ${now}`, new Error()
+                        );
+                        if(this.#_is_dir){
+                            if(this.click_count >= 2){
+                                LogMessage.log_message(
+                                    LogMessage.get_prog_id(),
+                                    `GzzListFileRow::handle_button_release_event: this.click_count == ${this.click_count}`,
+                                    new Error()
+                                );
+                                this.click_event_start = this.double_click_start = null;
+                                this.click_count = 0;
+                                //directory_filename = this.#_the_title.toString();
+                                const LM = LogMessage;
+                                const id = LM.get_prog_id();
+                                LM.log_message(
+                                    id,
+                                    `GzzListFileRow::handle_button_release_event: directory_filename == ${directory_filename}`,
+                                    new Error()
+                                );
+                                LM.log_message(
+                                    id, `GzzListFileRow::handle_button_release_event: path == ${path}`, new Error());
+                                this.remove_style_pseudo_class('active');
+                                this.emit('dblclick', directory_filename, event.get_button(), event.get_state(), path);
+                                return Clutter.EVENT_STOP;
+                            }else{
+                                // dir doesn't do single click //
+                                this.remove_style_pseudo_class('active');
+                                return Clutter.EVENT_STOP;
+                            }
+                        }else{ // if(this.#_is_dir) //
                             this.click_count = 0;
-                            //this.#_owner.double_clicked(this, this.#_title.text);
-                            this.emit('dblclick', this, event.get_button(), event.get_state());
+                            this.click_event_start = this.double_click_start = null;
+                            //this.#_owner.clicked(this, this.#_title.text);
+                            //directory_filename = this.#_the_title.toString();
+                            LogMessage.log_message(
+                                LogMessage.get_prog_id(),
+                                `GzzListFileRow::handle_button_release_event: directory_filename == ${directory_filename}`,
+                                new Error()
+                            );
                             this.remove_style_pseudo_class('active');
-                            return Clutter.EVENT_STOP;
-                        }else{
-                            // dir doesn't do single click //
-                            this.remove_style_pseudo_class('active');
+                            this.emit('clicked', directory_filename, event.get_button(), event.get_state(), path);
                             return Clutter.EVENT_STOP;
                         }
-                    }else{ // if(this.#_is_dir) //
-                        this.click_count = 0;
+                    }else{ // if(button_time > 0 && button_double_time < this.#_double_click_time) //
+                        // click time out //
                         this.click_event_start = this.double_click_start = null;
-                        //this.#_owner.clicked(this, this.#_title.text);
-                        this.emit('clicked', this, event.get_button(), event.get_state());
+                        this.click_count = 0;
                         this.remove_style_pseudo_class('active');
-                        return Clutter.EVENT_STOP;
+                        return Clutter.EVENT_PROPAGATE;
                     }
-                }else{ // if(button_time > 0 && button_double_time < this.#_double_click_time) //
-                    // click time out //
-                    this.click_event_start = this.double_click_start = null;
-                    this.click_count = 0;
-                    this.remove_style_pseudo_class('active');
+                default:
                     return Clutter.EVENT_PROPAGATE;
-                }
-            default:
-                return Clutter.EVENT_PROPAGATE;
-        } //switch(event.get_button()) //
-    } // handle_button_release_event(actor, event) //
+            } //switch(event.get_button()) //
+        } catch(e){
+            LogMessage.log_message(LogMessage.get_prog_id(), `GzzListFileRow::handle_button_release_event: Error: ${e}`, e);
+        }
+    } // handle_button_release_event(actor, event, directory_filename, path) //
 
     get_title() {
         return this.#_the_title;
@@ -3043,8 +3176,13 @@ export class GzzListFileRow extends St.BoxLayout {
 
     set_title(title_) {
         LogMessage.log_message(LogMessage.get_prog_id(), `GzzListFileRow::set_title: title_ == ‷${title_}‴`, new Error());
-        this.#_the_title  = title_;
-        this.#_title.text = this.#decorateFileName(title_);
+        if(title_){
+            this.#_the_title  = title_;
+            this.#_title.text = this.#decorateFileName( (title_ ? title_ : '') );
+        }else{
+            this.#_the_title  = '';
+            this.#_title.text = '';
+        }
     }
 
     get title(){
@@ -3257,16 +3395,18 @@ export class GzzFileDialog extends GzzFileDialogBase {
             LogMessage.log_message(LogMessage.get_prog_id(), `GzzFileDialog::constructor: dir_ == ${dir_}`, new Error());
             if(!dir_){
                 this.#_dir = Gio.File.new_for_path(GLib.build_filenamev([GLib.get_home_dir()]));
-            }else if(dir_ instanceof Gio.File){
-                this.#_dir = dir_;
             }else if((dir_ instanceof String || typeof dir_ == 'string') && dir_.trim() != ''){
                 this.#_dir = Gio.File.new_for_path(GLib.build_filenamev([dir_.trim()]));
+            }else if(dir_ instanceof Gio.File){
+                this.#_dir = dir_;
             }else{
                 this.#_dir = Gio.File.new_for_path(GLib.build_filenamev([GLib.get_home_dir()]));
             }
         }
 
-        LogMessage.log_message(LogMessage.get_prog_id(), `GzzFileDialog::constructor: this.#_dir == ‷${this.#_dir}‴`, new Error());
+        LogMessage.log_message(
+            LogMessage.get_prog_id(), `GzzFileDialog::constructor: this.#_dir == ‷${this.#_dir}‴`, new Error()
+        );
 
         if('file_name' in params){
             const file_name_ = params.file_name;
@@ -3458,12 +3598,14 @@ export class GzzFileDialog extends GzzFileDialogBase {
         LogMessage.log_message(LogMessage.get_prog_id(), `GzzFileDialog::set_dir: dir_ == ${dir_}`, new Error());
         if(!dir_){
             this.#_dir = Gio.File.new_for_path(GLib.build_filenamev([GLib.get_home_dir()]));
-        }else if(dir_ instanceof Gio.File){
-            LogMessage.log_message(LogMessage.get_prog_id(), `GzzFileDialog::set_dir: dir_ == ${dir_.get_path()}`, new Error());
-            this.#_dir = dir_;
         }else if((dir_ instanceof String || typeof dir_ == 'string') && dir_.trim() != ''){
             LogMessage.log_message(LogMessage.get_prog_id(), `GzzFileDialog::set_dir: dir_ == ${dir_}`, new Error());
             this.#_dir = Gio.File.new_for_path(GLib.build_filenamev([dir_.trim()]));
+        }else if(dir_ instanceof Gio.File){
+            LogMessage.log_message(
+                LogMessage.get_prog_id(), `GzzFileDialog::set_dir: dir_ == ${dir_.get_path()}`, new Error()
+            );
+            this.#_dir = dir_;
         }else{
             this.#_dir = Gio.File.new_for_path(GLib.build_filenamev([GLib.get_home_dir()]));
         }
@@ -3790,7 +3932,8 @@ export class GzzFileDialog extends GzzFileDialogBase {
         this.set_display_size(dsz);
     }
 
-    #clicked(row, _mousebtn, _state){
+    #clicked(filename, _mousebtn, _state, path){
+        /*
         if(!(row instanceof GzzListFileRow)){
             LogMessage.log_message(
                 LogMessage.get_prog_id(),
@@ -3800,39 +3943,79 @@ export class GzzFileDialog extends GzzFileDialogBase {
             return;
         } // if(!(row instanceof GzzListFileRow)) //
         const filename = row.get_title();
+        // */
         LogMessage.log_message(LogMessage.get_prog_id(), `GzzFileDialog::clicked: filename == ${filename}`, new Error());
-        this.set_file_name(filename);
+        LogMessage.log_message(LogMessage.get_prog_id(), `GzzFileDialog::clicked: path == ${path}`, new Error());
+        this.set_file_name(filename.toString());
     }
 
-    #double_clicked(row, _mousebtn, _state){
-        if(!(row instanceof GzzListFileRow)){
+    #double_clicked(directory, _mousebtn, _state, path){
+        try {
+        /*
+            if(!(row instanceof GzzListFileRow)){
+                LogMessage.log_message(
+                    LogMessage.get_prog_id(),
+                    `GzzFileDialog::double_clicked: this should only be called by GzzListFileRow, but you called it by ${row}`,
+                    new Error()
+                );
+                return;
+            } // if(!(row instanceof GzzListFileRow)) //
+            const directory = row.get_title();
+            // */
             LogMessage.log_message(
-                LogMessage.get_prog_id(),
-                `GzzFileDialog::double_clicked: this should only be called by GzzListFileRow, but you called it by ${row}`,
-                new Error()
+                LogMessage.get_prog_id(), `GzzFileDialog::double_clicked: directory == ${directory}`, new Error()
             );
-            return;
-        } // if(!(row instanceof GzzListFileRow)) //
-        const directory = row.get_title();
-        LogMessage.log_message(LogMessage.get_prog_id(), `GzzFileDialog::double_clicked: directory == ${directory}`, new Error());
-        if(directory === '.'){
-            return; // nothing to do //
-        }else if(directory === '..'){ // go up one dir //
-            const current_dir = this.#_dir.get_parent();
-            LogMessage.log_message(LogMessage.get_prog_id(), `GzzFileDialog::double_clicked: current_dir == ${current_dir.get_path()}`, new Error());
-            if(current_dir){
+            LogMessage.log_message(
+                LogMessage.get_prog_id(), `GzzFileDialog::double_clicked: path == ${path}`, new Error()
+            );
+            if(directory === '.'){
+                return; // nothing to do //
+            }else if(directory === '..'){ // go up one dir //
+                const current_dir = this.#_dir.get_parent();
+                LogMessage.log_message(LogMessage.get_prog_id(),
+                    `GzzFileDialog::double_clicked: current_dir == ${current_dir.get_path()}`, new Error());
+                if(current_dir){
+                    this.#_list_section.list_destroy_all_children(this);
+                    this.set_dir(current_dir);
+                    this.display_dir(this, current_dir);
+                    this.#fixup_header(current_dir);
+                }
+            }else if(directory){
+                LogMessage.log_message(
+                    LogMessage.get_prog_id(), `GzzFileDialog::double_clicked: directory == ${directory}`, new Error()
+                );
+                LogMessage.log_message(
+                    LogMessage.get_prog_id(),
+                    `GzzFileDialog::double_clicked: this.#_dir == ${this.#_dir.get_path()}`, new Error()
+                );
                 this.#_list_section.list_destroy_all_children(this);
+                /*
+                const dir = this.#_dir;
+                let path = null;
+                if(dir){
+                    if(dir instanceof Gio.File){
+                        path = dir.get_path();
+                    }else if(dir instanceof String || typeof dir === 'string'){
+                        path = dir;
+                    }
+                }
+                if(!path) throw new Error("bad path: ${path}!");
+                // */
+                const current_dir = Gio.File.new_for_path(GLib.build_filenamev([path, directory.toString()]));
+                //const current_dir = Gio.File.new_for_path(GLib.build_filenamev(['/home/grizzlysmit', 'tmp']));
+                LogMessage.log_message(
+                    LogMessage.get_prog_id(),
+                    `GzzFileDialog::double_clicked: current_dir == ${current_dir.get_path()}`, new Error()
+                );
+                if(!this.file_is_dir(current_dir)){
+                    throw new Error(`path: ${current_dir.get_path()} doesn't exist or is not a directory!`);
+                }
                 this.set_dir(current_dir);
                 this.display_dir(this, current_dir);
                 this.#fixup_header(current_dir);
             }
-        }else if(directory){
-            this.#_list_section.list_destroy_all_children(this);
-            const current_dir = Gio.File.new_for_path(GLib.build_filenamev([this.#_dir.get_path(), directory]));
-            LogMessage.log_message(LogMessage.get_prog_id(), `GzzFileDialog::double_clicked: current_dir == ${current_dir.get_path()}`, new Error());
-            this.set_dir(current_dir);
-            this.display_dir(this, current_dir);
-            this.#fixup_header(current_dir);
+        } catch(e) {
+            LogMessage.log_message(LogMessage.get_prog_id(), `GzzFileDialog::double_clicked: Error: ${e}:${e.stack}`, e);
         }
     }
     
@@ -3878,6 +4061,7 @@ export class GzzFileDialog extends GzzFileDialogBase {
         }
         let enumerator = null;
         let is_dir_    = null;
+        let is_special = null;
         let is_sym_    = null;
         let title_     = null;
         LogMessage.log_message(LogMessage.get_prog_id(), `GzzFileDialog::display_dir: start: filename == ‷${filename.get_path()}‴`, new Error());
@@ -3892,6 +4076,9 @@ export class GzzFileDialog extends GzzFileDialogBase {
                                                             + ",unix::blocks,mountable::unix-device-file"
                                                                 + ",standard::content-type,standard::type";
         try {
+            if(!this.file_is_dir(filename)){
+                throw new Error(`GzzFileDialog::display_dir: bad value for filename: ${filename.get_path()}`);
+            }
             let symlink_target_ = '';
             let info;
             {
@@ -3906,6 +4093,7 @@ export class GzzFileDialog extends GzzFileDialogBase {
                     file_type:            file_type_, 
                     symlink_target:       symlink_target_, 
                     file:                 filename, 
+                    dir:                  filename.get_path(), 
                     icon:                 info.get_icon(), 
                     icon_size:            this.get_icon_size(), 
                     create_time:          info.get_creation_date_time(),
@@ -3924,11 +4112,23 @@ export class GzzFileDialog extends GzzFileDialogBase {
                     display_size:         this.#_display_size,
                     base2_file_sizes:     this.#_base2_file_sizes, 
                 });
-                self_.connect('clicked', (thisrow, mousebtn, state) => {
-                    this.#clicked(thisrow, mousebtn, state);
+                self_.connect('clicked', (the_row, filename, mousebtn, state, path) => {
+                    const id = LogMessage.get_prog_id();
+                    LogMessage.log_message(id, `GzzListFileRow::decorateFileName:  the_row == ${the_row}`, new Error());
+                    LogMessage.log_message(id, `GzzListFileRow::decorateFileName:  filename == ${filename}`, new Error());
+                    LogMessage.log_message(id, `GzzListFileRow::decorateFileName:  mousebtn == ${mousebtn}`, new Error());
+                    LogMessage.log_message(id, `GzzListFileRow::decorateFileName:  state == ${state}`, new Error());
+                    LogMessage.log_message(id, `GzzListFileRow::decorateFileName:  path == ${path}`, new Error());
+                    this.#clicked(filename, mousebtn, state, path);
                 });
-                self_.connect('dblclick', (thisrow, mousebtn, state) => {
-                    this.#double_clicked(thisrow, mousebtn, state);
+                self_.connect('dblclick', (the_row, directory, mousebtn, state, path) => {
+                    const id = LogMessage.get_prog_id();
+                    LogMessage.log_message(id, `GzzListFileRow::decorateFileName:  the_row == ${the_row}`, new Error());
+                    LogMessage.log_message(id, `GzzListFileRow::decorateFileName:  directory == ${directory}`, new Error());
+                    LogMessage.log_message(id, `GzzListFileRow::decorateFileName:  mousebtn == ${mousebtn}`, new Error());
+                    LogMessage.log_message(id, `GzzListFileRow::decorateFileName:  state == ${state}`, new Error());
+                    LogMessage.log_message(id, `GzzListFileRow::decorateFileName:  path == ${path}`, new Error());
+                    this.#double_clicked(directory, mousebtn, state, path);
                 });
                 this.add_row(self_);
                 const parent_dir = filename.get_parent();
@@ -3945,6 +4145,7 @@ export class GzzFileDialog extends GzzFileDialogBase {
                     file_type:            file_type_, 
                     symlink_target:       symlink_target_, 
                     file:                 (parent_dir ? parent_dir : filename), 
+                    dir:                  (parent_dir ? parent_dir.get_path() : filename.get_path()), 
                     icon:                 info.get_icon(), 
                     icon_size:            this.get_icon_size(), 
                     create_time:          info.get_creation_date_time(),
@@ -3963,15 +4164,31 @@ export class GzzFileDialog extends GzzFileDialogBase {
                     display_size:         this.#_display_size,
                     base2_file_sizes:     this.#_base2_file_sizes, 
                 });
-                parent_.connect('clicked', (thisrow, mousebtn, state) => {
-                    this.#clicked(thisrow, mousebtn, state);
+                parent_.connect('clicked', (the_row, filename, mousebtn, state, path) => {
+                    const id = LogMessage.get_prog_id();
+                    LogMessage.log_message(id, `GzzListFileRow::decorateFileName:  the_row == ${the_row}`, new Error());
+                    LogMessage.log_message(id, `GzzListFileRow::decorateFileName:  filename == ${filename}`, new Error());
+                    LogMessage.log_message(id, `GzzListFileRow::decorateFileName:  mousebtn == ${mousebtn}`, new Error());
+                    LogMessage.log_message(id, `GzzListFileRow::decorateFileName:  state == ${state}`, new Error());
+                    LogMessage.log_message(id, `GzzListFileRow::decorateFileName:  path == ${path}`, new Error());
+                    this.#clicked(filename, mousebtn, state, path);
                 });
-                parent_.connect('dblclick', (thisrow, mousebtn, state) => {
-                    this.#double_clicked(thisrow, mousebtn, state);
+                parent_.connect('dblclick', (the_row, directory, mousebtn, state, path) => {
+                    const id = LogMessage.get_prog_id();
+                    LogMessage.log_message(id, `GzzListFileRow::decorateFileName:  the_row == ${the_row}`, new Error());
+                    LogMessage.log_message(id, `GzzListFileRow::decorateFileName:  directory == ${directory}`, new Error());
+                    LogMessage.log_message(id, `GzzListFileRow::decorateFileName:  mousebtn == ${mousebtn}`, new Error());
+                    LogMessage.log_message(id, `GzzListFileRow::decorateFileName:  state == ${state}`, new Error());
+                    LogMessage.log_message(id, `GzzListFileRow::decorateFileName:  path == ${path}`, new Error());
+                    this.#double_clicked(directory, mousebtn, state, path);
                 });
                 this.add_row(parent_);
             }
             enumerator = filename.enumerate_children(attributes, Gio.FileQueryInfoFlags.NOFOLLOW_SYMLINKS, null);
+            if(!enumerator){
+                throw new Error(`GzzFileDialog::display_dir: enumerator == ‷${enumerator}‴`
+                    + ` Error: filename: ${filename} bad value`);
+            }
             LogMessage.log_message(LogMessage.get_prog_id(), `GzzFileDialog::display_dir: enumerator == ‷${enumerator}‴`, new Error());
             while ((info = enumerator.next_file(null))) {
                 LogMessage.log_message(LogMessage.get_prog_id(), `GzzFileDialog::display_dir: info == ‷${info}‴`, new Error());
@@ -3988,6 +4205,7 @@ export class GzzFileDialog extends GzzFileDialogBase {
                 const file_type_ = info.get_file_type();
 
                 is_dir_ = (file_type_ === Gio.FileType.DIRECTORY);
+                is_special = (file_type_ === Gio.FileType.SPECIAL);
                 LogMessage.log_message(
                     LogMessage.get_prog_id(), `GzzFileDialog::display_dir: file_type_ == ‷${file_type_}‴`, new Error()
                 );
@@ -4014,11 +4232,11 @@ export class GzzFileDialog extends GzzFileDialogBase {
                     LogMessage.get_prog_id(), `GzzFileDialog::display_dir: is_dir_ == ‷${is_dir_}‴`, new Error()
                 );
                 const matches = info.get_name().match(this.#_filter);
-                if (!matches && !is_dir_) {
+                if (!matches && !(is_dir_ || is_special)) {
                     LogMessage.log_message(LogMessage.get_prog_id(), `GzzFileDialog::display_dir: matches == ‷${matches}‴`, new Error());
                     continue;
                 }
-                if(this.get_dialog_type().toString() === GzzDialogType.SelectDir.toString() && !is_dir_){
+                if(this.get_dialog_type().toString() === GzzDialogType.SelectDir.toString() && !(is_dir_ || is_special)){
                     LogMessage.log_message(
                         LogMessage.get_prog_id(),
                         `GzzFileDialog::display_dir: this.get_dialog_type().toString() == ‷${this.get_dialog_type().toString()}‴`,
@@ -4053,6 +4271,7 @@ export class GzzFileDialog extends GzzFileDialogBase {
                     symlink_target:       symlink_target_, 
                     symlink_mode:         query_info.get_attribute_uint32('unix::mode'),
                     file:                 Gio.File.new_for_path(GLib.build_filenamev([filename.get_path(), info.get_name()])),
+                    dir:                  filename.get_path(), 
                     icon:                 info.get_icon(), 
                     icon_size:            this.get_icon_size(), 
                     create_time:          info.get_creation_date_time(),
@@ -4071,11 +4290,23 @@ export class GzzFileDialog extends GzzFileDialogBase {
                     display_size:         this.#_display_size,
                     base2_file_sizes:     this.#_base2_file_sizes, 
                 });
-                row.connect('clicked', (thisrow, mousebtn, state) => {
-                    this.#clicked(thisrow, mousebtn, state);
+                row.connect('clicked', (the_row, filename, mousebtn, state, path) => {
+                    const id = LogMessage.get_prog_id();
+                    LogMessage.log_message(id, `GzzListFileRow::decorateFileName:  the_row == ${the_row}`, new Error());
+                    LogMessage.log_message(id, `GzzListFileRow::decorateFileName:  filename == ${filename}`, new Error());
+                    LogMessage.log_message(id, `GzzListFileRow::decorateFileName:  mousebtn == ${mousebtn}`, new Error());
+                    LogMessage.log_message(id, `GzzListFileRow::decorateFileName:  state == ${state}`, new Error());
+                    LogMessage.log_message(id, `GzzListFileRow::decorateFileName:  path == ${path}`, new Error());
+                    this.#clicked(filename, mousebtn, state, path);
                 });
-                row.connect('dblclick', (thisrow, mousebtn, state) => {
-                    this.#double_clicked(thisrow, mousebtn, state);
+                row.connect('dblclick', (the_row, directory, mousebtn, state, path) => {
+                    const id = LogMessage.get_prog_id();
+                    LogMessage.log_message(id, `GzzListFileRow::decorateFileName:  the_row == ${the_row}`, new Error());
+                    LogMessage.log_message(id, `GzzListFileRow::decorateFileName:  directory == ${directory}`, new Error());
+                    LogMessage.log_message(id, `GzzListFileRow::decorateFileName:  mousebtn == ${mousebtn}`, new Error());
+                    LogMessage.log_message(id, `GzzListFileRow::decorateFileName:  state == ${state}`, new Error());
+                    LogMessage.log_message(id, `GzzListFileRow::decorateFileName:  path == ${path}`, new Error());
+                    this.#double_clicked(directory, mousebtn, state, path);
                 });
 
                 this.add_row(row);
