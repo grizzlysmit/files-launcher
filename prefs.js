@@ -1529,7 +1529,7 @@ export default class FilesPreferences extends ExtensionPreferences {
         this._window = window;
 
         window._settings       = this.getSettings();
-        LogMessage.set_prog_id(LogMessage.get_prog_id());
+        LogMessage.set_prog_id('files-tracker');
         LogMessage.set_show_logs(this._window._settings.get_boolean('show-logs'));
         if(this._window._settings.get_int("position") < 0 || this._window._settings.get_int("position") > 25){ 
             this._window._settings.set_int("position", 0);
