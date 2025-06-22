@@ -36,7 +36,7 @@ import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as LogMessage from './log_message.js';
 import * as Constants from './icon_constants.js';
-import('gi://GioUnix?version=2.0').catch(() => {}); // Set version for optional dependency //
+//import('gi://GioUnix?version=2.0').catch(() => {}); // Set version for optional dependency //
 
 class ApplicationMenuItem extends PopupMenu.PopupBaseMenuItem {
     static {

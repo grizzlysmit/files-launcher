@@ -924,21 +924,21 @@ class FilesScroller extends PageBase {
         const length = this._caller.files.length;
         for(let _index = 0; _index < length; _index++){
             const file   = this._caller.files[_index];
-            const spinButton = new Gtk.SpinButton({
-                adjustment: new Gtk.Adjustment({
-                    lower:          0,
-                    upper:          length - 1,
-                    step_increment: 1,
-                    page_increment: 1,
-                    page_size:      0,
-                    value:          _index, 
-                }),
-                climb_rate:         1,
-                activates_default:  Gtk.SpinButtonUpdatePolicy.IF_VALID, 
-                digits:             0,
-                numeric:            true, 
-                css_name:           'updown-spin', 
-                valign:             Gtk.Align.CENTER,
+            const up     = new Gtk.Button({
+                                label: "▲",
+                                css_classes: ['note-label'],
+                                hexpand: false,
+                                vexpand: false,
+                                valign: Gtk.Align.END,
+                                sensitive: (_index > 0), 
+            });
+            const down   = new Gtk.Button({
+                                label: "▼",
+                                css_classes: ['note-label'],
+                                hexpand: false,
+                                vexpand: false,
+                                valign: Gtk.Align.END,
+                                sensitive: (_index < length - 1), 
             });
             const button = new Gtk.Button({
                                 label: ">...",
@@ -954,13 +954,39 @@ class FilesScroller extends PageBase {
                                 activatable_widget: button, 
                                 title_lines: this._caller.max_file_entry_length, 
             });
-            row.add_suffix(spinButton);
-            spinButton.connect('value-changed', (sb) => {
-                const i = sb.adjustment.get_value();
-                const elt = this._caller.files.splice(_index, 1)[0];
-                this._caller.files.splice(i, 0, elt);
-                this._caller._window._settings.set_strv('files', this._caller.files);
-                this.refresh();
+            row.add_suffix(up);
+            row.add_suffix(down);
+            up.connect('clicked', () => {
+                const i = _index - 1;
+                this._caller.log_message(
+                    LogMessage.get_prog_id(), `FilesScroller::constructor: i == ${i}`, new Error()
+                );
+                this._caller.log_message(
+                    LogMessage.get_prog_id(), `FilesScroller::constructor: _index == ${_index}`, new Error()
+                );
+                if(i < 0 || i >= length) return;
+                if(i !== _index){
+                    const elt = this._caller.files.splice(_index, 1)[0];
+                    this._caller.files.splice(i, 0, elt);
+                    this._caller._window._settings.set_strv('files', this._caller.files);
+                    this.refresh();
+                }
+            });
+            down.connect('clicked', () => {
+                const i = _index + 1;
+                this._caller.log_message(
+                    LogMessage.get_prog_id(), `FilesScroller::constructor: i == ${i}`, new Error()
+                );
+                this._caller.log_message(
+                    LogMessage.get_prog_id(), `FilesScroller::constructor: _index == ${_index}`, new Error()
+                );
+                if(i < 0 || i >= length) return;
+                if(i !== _index){
+                    const elt = this._caller.files.splice(_index, 1)[0];
+                    this._caller._window._settings.set_strv('files', this._caller.files);
+                    this._caller.files.splice(i, 0, elt);
+                    this.refresh();
+                }
             });
             row.add_suffix(button);
             this.filesGroup.add(row);
@@ -992,20 +1018,21 @@ class FilesScroller extends PageBase {
         const length = this._caller.files.length;
         for(let _index = 0; _index < length; _index++){
             const file   = this._caller.files[_index];
-            const spinButton = new Gtk.SpinButton({
-                adjustment: new Gtk.Adjustment({
-                    lower:          0,
-                    upper:          length - 1,
-                    step_increment: 1,
-                    page_increment: 1,
-                    page_size:      0,
-                    value:          _index, 
-                }),
-                climb_rate:         1,
-                digits:             0,
-                numeric:            true, 
-                css_name:           'updown-spin', 
-                valign:             Gtk.Align.CENTER,
+            const up     = new Gtk.Button({
+                                label: "▲",
+                                css_classes: ['note-label'],
+                                hexpand: false,
+                                vexpand: false,
+                                valign: Gtk.Align.END,
+                                sensitive: (_index > 0), 
+            });
+            const down   = new Gtk.Button({
+                                label: "▼",
+                                css_classes: ['note-label'],
+                                hexpand: false,
+                                vexpand: false,
+                                valign: Gtk.Align.END,
+                                sensitive: (_index < length - 1), 
             });
             const button = new Gtk.Button({
                                 label: ">...",
@@ -1020,13 +1047,39 @@ class FilesScroller extends PageBase {
                                 activatable_widget: button, 
                                 title_lines: this._caller.max_file_entry_length, 
             });
-            row.add_suffix(spinButton);
-            spinButton.connect('value-changed', (sb) => {
-                const i = sb.adjustment.get_value();
-                const elt = this._caller.files.splice(_index, 1)[0];
-                this._caller.files.splice(i, 0, elt);
-                this._caller._window._settings.set_strv('files', this._caller.files);
-                this.refresh();
+            row.add_suffix(up);
+            row.add_suffix(down);
+            up.connect('clicked', () => {
+                const i = _index - 1;
+                this._caller.log_message(
+                    LogMessage.get_prog_id(), `FilesScroller::refresh: i == ${i}`, new Error()
+                );
+                this._caller.log_message(
+                    LogMessage.get_prog_id(), `FilesScroller::refresh: _index == ${_index}`, new Error()
+                );
+                if(i < 0 || i >= length) return;
+                if(i !== _index){
+                    const elt = this._caller.files.splice(_index, 1)[0];
+                    this._caller.files.splice(i, 0, elt);
+                    this._caller._window._settings.set_strv('files', this._caller.files);
+                    this.refresh();
+                }
+            });
+            down.connect('clicked', () => {
+                const i = _index + 1;
+                this._caller.log_message(
+                    LogMessage.get_prog_id(), `FilesScroller::refresh: i == ${i}`, new Error()
+                );
+                this._caller.log_message(
+                    LogMessage.get_prog_id(), `FilesScroller::refresh: _index == ${_index}`, new Error()
+                );
+                if(i < 0 || i >= length) return;
+                if(i !== _index){
+                    const elt = this._caller.files.splice(_index, 1)[0];
+                    this._caller._window._settings.set_strv('files', this._caller.files);
+                    this._caller.files.splice(i, 0, elt);
+                    this.refresh();
+                }
             });
             row.add_suffix(button);
             this.filesGroup.add(row);

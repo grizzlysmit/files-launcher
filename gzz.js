@@ -15,8 +15,8 @@ import * as ModalDialog from 'resource:///org/gnome/shell/ui/modalDialog.js';
 import GObject from 'gi://GObject';
 import GLib from 'gi://GLib';
 import Gio from 'gi://Gio';
-//import GioUnix from 'gi://GioUnix';
-//*
+import GioUnix from 'gi://GioUnix';
+/*
 // Retain compatibility with GLib < 2.80, which lacks GioUnix
 let GioUnix;
 try {
@@ -4045,6 +4045,20 @@ export class GzzFileDialog extends GzzFileDialogBase {
         }
     } // file_is_dir(file) //
 
+    mkdir_with_parents(file) {
+        let res = false;
+        try {
+            res = file.make_directory_with_parents(null);
+        } catch(e) {
+            if(e.matches(Gio.IOErrorEnum, Gio.IOErrorEnum.EXISTS)){
+                res = true;
+            }else{
+                throw e;
+            }
+        }
+        return res;
+    } // mkdir_with_parents(file) //
+
     display_dir(caller, filename){
         if(!(caller instanceof GzzFileDialogBase)
             && !(caller instanceof AbstractListFileSection)
@@ -4076,8 +4090,11 @@ export class GzzFileDialog extends GzzFileDialogBase {
                                                             + ",unix::blocks,mountable::unix-device-file"
                                                                 + ",standard::content-type,standard::type";
         try {
+            if(!this.mkdir_with_parents(filename)){
+                throw { message: `Error: directory ‷${filename.get_path()}‴ does not exist and cannot be created`, };
+            }
             if(!this.file_is_dir(filename)){
-                throw new Error(`GzzFileDialog::display_dir: bad value for filename: ${filename.get_path()}`);
+                throw new Error(`GzzFileDialog::display_dir: bad value for filename: ‷${filename.get_path()}‴`);
             }
             let symlink_target_ = '';
             let info;
