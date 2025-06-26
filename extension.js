@@ -85,17 +85,17 @@ class ApplicationMenuItem extends PopupMenu.PopupBaseMenuItem {
                 _icon_name = "filemanager-app";
                 gicon = Gio.icon_new_for_string(_icon_name);
                 icon.gicon = gicon;
-                icon.icon_size = this._button._caller.settings.get_int('menu-button-icon-size');
+                icon.icon_size = this._button.settings.get_int('menu-button-icon-size');
                 break;
             case "file":
                 icon = new St.Icon({
                     icon_name:   'notes-app',
                     style_class: 'system-status-icon',
                 });
-                icon.icon_size = this._button._caller.settings.get_int('menu-button-icon-size');
+                icon.icon_size = this._button.settings.get_int('menu-button-icon-size');
                 break;
             case "desktop":
-                app  = this._button._caller.appSys.lookup_app(this._button._caller.files[index]);
+                app  = this._button.appSys.lookup_app(this._button.files[index]);
                 if(!app){
                     icon = new St.Icon({
                         style_class: 'icon-dropshadow',
@@ -103,10 +103,10 @@ class ApplicationMenuItem extends PopupMenu.PopupBaseMenuItem {
                     _icon_name = "filemanager-app";
                     gicon = Gio.icon_new_for_string(_icon_name);
                     icon.gicon = gicon;
-                    icon.icon_size = this._button._caller.settings.get_int('menu-button-icon-size');
+                    icon.icon_size = this._button.settings.get_int('menu-button-icon-size');
                     return icon;
                 }
-                icon = app.create_icon_texture(this._button._caller.settings.get_int('menu-button-icon-size'));
+                icon = app.create_icon_texture(this._button.settings.get_int('menu-button-icon-size'));
                 break;
             case "executable":
                 icon = new St.Icon({
@@ -115,10 +115,10 @@ class ApplicationMenuItem extends PopupMenu.PopupBaseMenuItem {
                 _icon_name = "application-x-executable";
                 gicon = Gio.icon_new_for_string(_icon_name);
                 icon.gicon = gicon;
-                icon.icon_size = this._button._caller.settings.get_int('menu-button-icon-size');
+                icon.icon_size = this._button.settings.get_int('menu-button-icon-size');
                 break;
             case "settings":
-                app  = this._button._caller.appSys.lookup_app('org.gnome.settings');
+                app  = this._button.appSys.lookup_app('org.gnome.settings');
                 if(!app){
                     icon = new St.Icon({
                         style_class: 'icon-dropshadow',
@@ -126,10 +126,10 @@ class ApplicationMenuItem extends PopupMenu.PopupBaseMenuItem {
                     _icon_name = "filemanager-app";
                     gicon = Gio.icon_new_for_string(_icon_name);
                     icon.gicon = gicon;
-                    icon.icon_size = this._button._caller.settings.get_int('menu-button-icon-size');
+                    icon.icon_size = this._button.settings.get_int('menu-button-icon-size');
                     return icon;
                 }
-                icon = app.create_icon_texture(this._button._caller.settings.get_int('menu-button-icon-size'));
+                icon = app.create_icon_texture(this._button.settings.get_int('menu-button-icon-size'));
                 break;
             default:
                 icon = new St.Icon({
@@ -138,7 +138,7 @@ class ApplicationMenuItem extends PopupMenu.PopupBaseMenuItem {
                 _icon_name = "filemanager-app";
                 gicon = Gio.icon_new_for_string(_icon_name);
                 icon.gicon = gicon;
-                icon.icon_size = this._button._caller.settings.get_int('menu-button-icon-size'); 
+                icon.icon_size = this._button.settings.get_int('menu-button-icon-size'); 
         } // switch (this.item.type) //
         if(!icon){
             icon = new St.Icon({
@@ -148,7 +148,7 @@ class ApplicationMenuItem extends PopupMenu.PopupBaseMenuItem {
             _icon_name = "filemanager-app";
             gicon = Gio.icon_new_for_string(_icon_name);
             icon.gicon = gicon;
-            icon.icon_size = this._button._caller.settings.get_int('menu-button-icon-size');
+            icon.icon_size = this._button.settings.get_int('menu-button-icon-size');
         }
         return icon;
     } // getIcon() //
@@ -203,7 +203,7 @@ class ApplicationMenuItem extends PopupMenu.PopupBaseMenuItem {
         if(GLib.find_program_in_path(editor) === null){
             editor = 'nano';
         }
-        filesfile = this._button._caller.files[index];
+        filesfile = this._button.files[index];
         /*
         dlg          = new Gzz.GzzMessageDialog('ApplicationMenuItem::activate(event)', `Proccessing event: ‷${event}‴.`);
         LogMessage.log_message(LogMessage.get_prog_id(), `ApplicationMenuItem::activate: dlg == ‷${dlg}‴`, new Error());
@@ -262,7 +262,7 @@ class ApplicationMenuItem extends PopupMenu.PopupBaseMenuItem {
                             );
                             break;
                         case 'run':
-                            app = this._caller.appSys.lookup_app(filesfile);
+                            app = this._button.appSys.lookup_app(filesfile);
                             if(app !== null){
                                 app.activate();
                                 return true;
@@ -324,7 +324,7 @@ class ApplicationMenuItem extends PopupMenu.PopupBaseMenuItem {
                             );
                             dlg = new Gzz.GzzMessageDialog(
                                 _('Are you sure'),
-                                _(`Are you sure you want to delete file entry: ‷${this._button._caller.files[index]}⁗.`),
+                                _(`Are you sure you want to delete file entry: ‷${this._button.files[index]}⁗.`),
                                 'emblem-dialog-question', 
                                 [
                                     {
@@ -332,8 +332,8 @@ class ApplicationMenuItem extends PopupMenu.PopupBaseMenuItem {
                                         icon_name: 'stock_yes', 
                                         action: () => {
                                             dlg.set_result(true);
-                                            this._button._caller.files.splice(index, 1);
-                                            this._button._caller.settings.set_strv('files', this._button._caller.files);
+                                            this._button.files.splice(index, 1);
+                                            this._button.settings.set_strv('files', this._button.files);
                                             dlg.destroy();
                                         }, 
                                     }, 
@@ -355,9 +355,9 @@ class ApplicationMenuItem extends PopupMenu.PopupBaseMenuItem {
                                 `ApplicationMenuItem::activate: edit-delete-in-prefs: index: ‷${index}‴.`,
                                 new Error()
                             );
-                            this._button._caller.settings.set_int('index', index);
-                            this._button._caller.settings.set_boolean("edit-page", true);
-                            this._button._caller.settings.set_enum('page', string2enum['editFileEntry']);
+                            this._button.settings.set_int('index', index);
+                            this._button.settings.set_boolean("edit-page", true);
+                            this._button.settings.set_enum('page', string2enum['editFileEntry']);
                             this._button._caller.openPreferences();
                             break;
                         case 'up':
@@ -366,20 +366,21 @@ class ApplicationMenuItem extends PopupMenu.PopupBaseMenuItem {
                                 `ApplicationMenuItem::activate: up: index: ‷${index}‴.`,
                                 new Error()
                             );
-                            if(index < 1 || index >= this._button._caller.files.length) break;
-                            elt = this._button._caller.files.splice(index, 1)[0];
+                            if(index < 1 || index >= this._button.files.length) break;
+                            elt = this._button.files.splice(index, 1)[0];
                             LogMessage.log_message(
                                 LogMessage.get_prog_id(),
                                 `ApplicationMenuItem::activate: up: elt: ‷${elt}‴.`,
                                 new Error()
                             );
-                            this._button._caller.files.splice(index - 1, 0, elt);
+                            this._button.files.splice(index - 1, 0, elt);
                             LogMessage.log_message(
                                 LogMessage.get_prog_id(),
-                                `ApplicationMenuItem::activate: up: this._button._caller.files: ‷${JSON.stringify(this._button._caller.files)}‴.`,
+                                'ApplicationMenuItem::activate: up: this._button.files: '
+                                                            + `‷${JSON.stringify(this._button.files)}‴.`,
                                 new Error()
                             );
-                            this._button._caller.settings.set_strv('files', this._button._caller.files);
+                            this._button.settings.set_strv('files', this._button.files);
                             break;
                         case 'down':
                             LogMessage.log_message(
@@ -387,20 +388,21 @@ class ApplicationMenuItem extends PopupMenu.PopupBaseMenuItem {
                                 `ApplicationMenuItem::activate: down: index: ‷${index}‴.`,
                                 new Error()
                             );
-                            if(index < 0 || index >= this._button._caller.files.length - 1) break;
-                            elt = this._button._caller.files.splice(index, 1)[0];
+                            if(index < 0 || index >= this._button.files.length - 1) break;
+                            elt = this._button.files.splice(index, 1)[0];
                             LogMessage.log_message(
                                 LogMessage.get_prog_id(),
                                 `ApplicationMenuItem::activate: down: elt: ‷${elt}‴.`,
                                 new Error()
                             );
-                            this._button._caller.files.splice(index + 1, 0, elt);
+                            this._button.files.splice(index + 1, 0, elt);
                             LogMessage.log_message(
                                 LogMessage.get_prog_id(),
-                                `ApplicationMenuItem::activate: down: this._button._caller.files: ‷${JSON.stringify(this._button._caller.files)}‴.`,
+                                'ApplicationMenuItem::activate: down: this._button.files: ' 
+                                                        + `‷${JSON.stringify(this._button.files)}‴.`,
                                 new Error()
                             );
-                            this._button._caller.settings.set_strv('files', this._button._caller.files);
+                            this._button.settings.set_strv('files', this._button.files);
                             break;
                     } // switch(this._item.subtype) //
                     break;
@@ -414,26 +416,26 @@ class ApplicationMenuItem extends PopupMenu.PopupBaseMenuItem {
                         dir:                  _dir, 
                         file_name:            _file_name, 
                         dialogtype:           _dialogtype, 
-                        display_times:        this._button._caller.settings.get_enum('time-type'), 
-                        display_inode:        this._button._caller.settings.get_boolean('display-inode'), 
-                        display_user_group:   this._button._caller.settings.get_enum('user-group'), 
-                        display_mode:         this._button._caller.settings.get_boolean('display-mode'),
-                        display_number_links: this._button._caller.settings.get_boolean('display-number-links'),
-                        display_size:         this._button._caller.settings.get_boolean('display-size'),
-                        show_icon:            this._button._caller.settings.get_boolean('display-icon'),
-                        base2_file_sizes:     this._button._caller.settings.get_boolean('base2-file-sizes'),
+                        display_times:        this._button.settings.get_enum('time-type'), 
+                        display_inode:        this._button.settings.get_boolean('display-inode'), 
+                        display_user_group:   this._button.settings.get_enum('user-group'), 
+                        display_mode:         this._button.settings.get_boolean('display-mode'),
+                        display_number_links: this._button.settings.get_boolean('display-number-links'),
+                        display_size:         this._button.settings.get_boolean('display-size'),
+                        show_icon:            this._button.settings.get_boolean('display-icon'),
+                        base2_file_sizes:     this._button.settings.get_boolean('base2-file-sizes'),
                         filter:               Gzz.string2RegExp(new RegExp('^.*$',                      'i'), 'i'), 
                         filters:              [
                             new RegExp('^.*$',                      'i'), 
                         ], 
                         filters_flags:        'i', 
-                        double_click_time:    this._button._caller.settings.get_int('double-click-time'), 
+                        double_click_time:    this._button.settings.get_int('double-click-time'), 
                         save_done:            (dlg_, result, _dir, _file_name) => {
                             if(result){
                                 filesfile = dlg_.get_full_path();
                                 if(filesfile){
-                                    this._button._caller.files.unshift(filesfile.get_path());
-                                    this._button._caller.settings.set_strv('files', this._button._caller.files);
+                                    this._button.files.unshift(filesfile.get_path());
+                                    this._button.settings.set_strv('files', this._button.files);
                                 } // if(filesfile) //
                             } // if(result) //
                         }, 
@@ -450,26 +452,26 @@ class ApplicationMenuItem extends PopupMenu.PopupBaseMenuItem {
                         dir:                  _dir, 
                         file_name:            _file_name, 
                         dialogtype:           _dialogtype, 
-                        display_times:        this._button._caller.settings.get_enum('time-type'), 
-                        display_inode:        this._button._caller.settings.get_boolean('display-inode'), 
-                        display_user_group:   this._button._caller.settings.get_enum('user-group'), 
-                        display_mode:         this._button._caller.settings.get_boolean('display-mode'),
-                        display_number_links: this._button._caller.settings.get_boolean('display-number-links'),
-                        display_size:         this._button._caller.settings.get_boolean('display-size'),
-                        show_icon:            this._button._caller.settings.get_boolean('display-icon'),
-                        base2_file_sizes:     this._button._caller.settings.get_boolean('base2-file-sizes'),
+                        display_times:        this._button.settings.get_enum('time-type'), 
+                        display_inode:        this._button.settings.get_boolean('display-inode'), 
+                        display_user_group:   this._button.settings.get_enum('user-group'), 
+                        display_mode:         this._button.settings.get_boolean('display-mode'),
+                        display_number_links: this._button.settings.get_boolean('display-number-links'),
+                        display_size:         this._button.settings.get_boolean('display-size'),
+                        show_icon:            this._button.settings.get_boolean('display-icon'),
+                        base2_file_sizes:     this._button.settings.get_boolean('base2-file-sizes'),
                         filter:               Gzz.string2RegExp(new RegExp('^.*$',                      'i'), 'i'), 
                         filters:              [
                             new RegExp('^.*$',                      'i'), 
                         ], 
                         filters_flags:        'i', 
-                        double_click_time:    this._button._caller.settings.get_int('double-click-time'), 
+                        double_click_time:    this._button.settings.get_int('double-click-time'), 
                         save_done:            (dlg_, result, _dir, _file_name) => {
                             if(result){
                                 filesfile = dlg_.get_dir();
                                 if(filesfile){
-                                    this._button._caller.files.unshift(filesfile.get_path());
-                                    this._button._caller.settings.set_strv('files', this._button._caller.files);
+                                    this._button.files.unshift(filesfile.get_path());
+                                    this._button.settings.set_strv('files', this._button.files);
                                 } // if(filesfile) //
                             } // if(result) //
                         }, 
@@ -490,9 +492,11 @@ class ApplicationMenuItem extends PopupMenu.PopupBaseMenuItem {
                 case "filesScroller":
                 case "aboutPage":
                 case "credits":
-                    LogMessage.log_message(LogMessage.get_prog_id(), `files: settings, etc: this._item.type: ‷${this._item.type}‴.`, new Error());
-                    this._button._caller.settings.set_boolean("edit-page", true);
-                    this._button._caller.settings.set_enum("page", string2enum[this._item.type]);
+                    LogMessage.log_message(
+                        LogMessage.get_prog_id(), `files: settings, etc: this._item.type: ‷${this._item.type}‴.`, new Error()
+                    );
+                    this._button.settings.set_boolean("edit-page", true);
+                    this._button.settings.set_enum("page", string2enum[this._item.type]);
                     this._button._caller.openPreferences();
                     break;
             } // switch (this._item.type) //
@@ -513,21 +517,41 @@ class Indicator extends PanelMenu.Button {
 
     constructor(caller) {
         super(0.0, _('Files Launcher'));
-        this._caller = caller;
-        this.appSys = this._caller.appSys;
+        this._caller                 = caller;
+        this.appSys                  = Shell.AppSystem.get_default();
+        this.settings                = this._caller.getSettings();
 
+        this.areas                   = ["left", "center", "right"];
+        this.show_messages           = this.settings.get_int("show-messages");
+        this.page_name               = this.settings.get_enum("page");
+        this.index                   = this.settings.get_int("index");
+        this.files                   = this.settings.get_strv("files");
+        this.max_file_entry_length   = this.settings.get_int("max-file-entry-length");
+        this.edit_page               = this.settings.get_boolean("edit-page");
+        this.filesname               = this.settings.get_string("filesname");
+        const tmp_path               = this.settings.get_string("filespath").trim();
+        this.set_filespath(tmp_path);
+        
+        LogMessage.set_prog_id('files-launcher');
+        LogMessage.set_show_logs(this.settings.get_boolean('show-logs'));
+        this.settings.set_enum('area', this.settings.get_enum('area'));
+        if(this.settings.get_int("position") < 0 || this.settings.get_int("position") > 25){
+            this.settings.set_int("position", 0);
+        }
+        this.settings.set_int('max-file-entry-length', this.max_file_entry_length);
+        this.settings.set_int('show-messages', this.settings.get_int('show-messages'));
 
         this.icon = new St.Icon({
             icon_name: 'filemanager-app',
             style_class: 'system-status-icon',
         });
 
-        this._caller.settings.connectObject('changed::hide-icon-shadow', () => this.hideIconShadow(), this);
-        this._caller.settings.connectObject('changed::menu-button-icon-image', () => this.setIconImage(), this);
-        this._caller.settings.connectObject('changed::monochrome-icon', () => this.setIconImage(), this);
-        this._caller.settings.connectObject('changed::use-custom-icon', () => this.setIconImage(), this);
-        this._caller.settings.connectObject('changed::custom-icon-path', () => this.setIconImage(), this);
-        this._caller.settings.connectObject('changed::menu-button-icon-size', () => this.setIconSize(), this);
+        this.settings.connectObject('changed::hide-icon-shadow', () => this.hideIconShadow(), this);
+        this.settings.connectObject('changed::menu-button-icon-image', () => this.setIconImage(), this);
+        this.settings.connectObject('changed::monochrome-icon', () => this.setIconImage(), this);
+        this.settings.connectObject('changed::use-custom-icon', () => this.setIconImage(), this);
+        this.settings.connectObject('changed::custom-icon-path', () => this.setIconImage(), this);
+        this.settings.connectObject('changed::menu-button-icon-size', () => this.setIconSize(), this);
 	
         this.hideIconShadow();
         this.setIconImage();
@@ -535,27 +559,119 @@ class Indicator extends PanelMenu.Button {
 
         this.add_child(this.icon);
 
-        const tmp = this._caller.settings.get_string("filespath").trim();
+        const tmp = this.settings.get_string("filespath").trim();
 
         const filespath = ((tmp == '') ?
             GLib.build_filenamev([GLib.get_home_dir()]) :
                                     GLib.build_filenamev([tmp]));
 
         this.dir_path = Gio.File.new_for_path(filespath);
-        this._caller.settings.set_boolean('edit-page', this._caller.edit_page);
+        this.settings.set_boolean('edit-page', this.edit_page);
 
-        const file_name = this._caller.filesname.trim();
+        const file_name = this.filesname.trim();
         
-        this._caller.filesname     = ((file_name == '') ? 'files.txt' : file_name);
+        this.filesname     = ((file_name == '') ? 'files.txt' : file_name);
 
         this.loadFileEntries();
 
+        const area            = this.areas[this.settings.get_enum("area")];
+        LogMessage.log_message(LogMessage.get_prog_id(), `area == ${area}`, new Error());
+        Main.panel.addToStatusArea(this._caller._name, this, this.settings.get_int("position"), area);
+
+        this.settingsID_show     = this.settings.connect("changed::show-messages", () => {
+            this.show_messages   = this.settings.get_int("show-messages");
+            this._indicator.refesh_menu();
+        }); 
+        this.settingsID_area     = this.settings.connect("changed::area", this.onPositionChanged.bind(this)); 
+        this.settingsID_pos      = this.settings.connect("changed::position", this.onPositionChanged.bind(this)); 
+        this.settingsID_files    = this.settings.connect("changed::files", this.onFilesChanged.bind(this)); 
+        this.settingsID_max      = this.settings.connect("changed::max-file-entry-length", () => {
+            this.max_file_entry_length = this.settings.get_int("max-file-entry-length");
+            this._indicator.refesh_menu();
+        }); 
+        this.settingsID_dir      = this.settings.connect('changed::filespath', () => {
+            this.set_filespath(this.settings.get_string("filespath").trim());
+        });
+        this.settingsID_filename = this.settings.connect('changed::filesname', () => {
+            this.filesname         = this.settings.get_string("filesname");
+        });
+        this.settingsID_icon_size = this.settings.connect('changed::menu-button-icon-size', () => {
+            this._indicator.refesh_menu();
+        });
+        this.settingsID_show_logs = this.settings.connect('changed::show-logs', () => {
+            LogMessage.set_show_logs(this.settings.get_boolean('show-logs'));
+        });
+
     } // constructor(caller) //
 
+    set_filespath(path_){
+        LogMessage.log_message(LogMessage.get_prog_id(), `FilesLauncherExtension::set_filespath: path_: ${path_}`, new Error());
+        if(!path_){
+            this.filespath = Gio.File.new_for_path(GLib.build_filenamev([GLib.get_home_dir()]));
+            this.settings.set_string("filespath", this.filespath.get_path());
+        }else if(path_ instanceof String){
+            const path = GLib.build_filenamev([path_.toString()]);
+            if(path){
+                this.filespath = Gio.File.new_for_path(path);
+            }else{
+                LogMessage.log_message(
+                    LogMessage.get_prog_id(), 
+                    `FilesLauncherExtension::set_filespath_error: bad value for path: ${path}: `
+                    + `genrated from path_: ${path_}:`, 
+                    new Error()
+                );
+                this.display_error_msg(
+                    'FilesLauncherExtension::set_filespath',
+                    `FilesLauncherExtension::set_filespath: bad value for path: ${path} genrated from path_: ${path_}: `, 
+                    new Error()
+                );
+            }
+        }else{ // if(!path_) else if(path_ instanceof String) //
+            const path = GLib.build_filenamev([path_.toString()]);
+            if(path){
+                this.filespath = Gio.File.new_for_path(path);
+            }else{
+                LogMessage.log_message(
+                    LogMessage.get_prog_id(), 
+                    `FilesLauncherExtension::set_filespath_error: bad value for path: ${path}: `
+                    + `genrated from path_: ${path_}:`, 
+                    new Error()
+                );
+                this.display_error_msg(
+                    'FilesLauncherExtension::set_filespath',
+                    `FilesLauncherExtension::set_filespath: bad value for path: ${path} genrated from path_: ${path_}: `,
+                    new Error()
+                );
+            } // if(path) ... else ... //
+        } // if(!path_) else if(path_ instanceof String) ... else ... //
+    } // set_filespath(path_) //
+
+    onPositionChanged(){
+        Main.panel.menuManager.removeMenu(this.menu);
+        Main.panel.statusArea[this._caller._name] = null;
+        const area      = this.areas[this.settings.get_enum("area")];
+        LogMessage.log_message(LogMessage.get_prog_id(), `area == ${area}`, new Error());
+        const position  = this.settings.get_int("position");
+        Main.panel.addToStatusArea(this._caller._name, this, position, area);
+    }
+
+    onFilesChanged(){
+        this.files                        = this.settings.get_strv("files");
+        LogMessage.log_message(
+            LogMessage.get_prog_id(),
+            `FilesLauncherExtension::onFilesChanged: this.files: ${JSON.stringify(this.files)}`, new Error()
+        );
+        this.refesh_menu();
+        LogMessage.log_message(
+            LogMessage.get_prog_id(),
+            `FilesLauncherExtension::onFilesChanged: this.files: ${JSON.stringify(this.files)}`, new Error()
+        );
+    }
+
     save_to_file(){
-        const file_name = this._caller.filesname.trim();
-        const path      = this._caller.filespath.get_path();
-        const cont      = this._caller.files.join("\r\n");
+        const file_name = this.filesname.trim();
+        const path      = this.filespath.get_path();
+        const cont      = this.files.join("\r\n");
         const _dialogtype = Gzz.GzzDialogType.Save;
         LogMessage.log_message(LogMessage.get_prog_id(), `file_name: ‷${file_name}‴.`, new Error());
         LogMessage.log_message(LogMessage.get_prog_id(), `path: ‷${path}‴.`, new Error());
@@ -567,7 +683,7 @@ class Indicator extends PanelMenu.Button {
             dir:                  path, 
             file_name:            ((file_name == '') ? 'files.txt' : file_name), 
             contents:             cont, 
-            filter:               Gzz.string2RegExp(this._caller.settings.get_string('filter'), 'i'), 
+            filter:               Gzz.string2RegExp(this.settings.get_string('filter'), 'i'), 
             filters:              [
                 new RegExp('^.*\\.txt$',                'i'), 
                 new RegExp('^.*\\.files$',              'i'), 
@@ -575,27 +691,27 @@ class Indicator extends PanelMenu.Button {
                 new RegExp('^.*$',                      'i'), 
             ], 
             filters_flags:        'i', 
-            icon_size:            this._caller.settings.get_int('icon-size'), 
-            display_times:        this._caller.settings.get_enum('time-type'), 
-            display_inode:        this._caller.settings.get_boolean('display-inode'), 
-            display_user_group:   this._caller.settings.get_enum('user-group'), 
-            display_mode:         this._caller.settings.get_boolean('display-mode'),
-            display_number_links: this._caller.settings.get_boolean('display-number-links'),
-            display_size:         this._caller.settings.get_boolean('display-size'),
-            base2_file_sizes:     this._caller.settings.get_boolean('base2-file-sizes'),
-            show_icon:            this._caller.settings.get_boolean('display-icon'),
-            double_click_time:    this._caller.settings.get_int('double-click-time'), 
+            icon_size:            this.settings.get_int('icon-size'), 
+            display_times:        this.settings.get_enum('time-type'), 
+            display_inode:        this.settings.get_boolean('display-inode'), 
+            display_user_group:   this.settings.get_enum('user-group'), 
+            display_mode:         this.settings.get_boolean('display-mode'),
+            display_number_links: this.settings.get_boolean('display-number-links'),
+            display_size:         this.settings.get_boolean('display-size'),
+            base2_file_sizes:     this.settings.get_boolean('base2-file-sizes'),
+            show_icon:            this.settings.get_boolean('display-icon'),
+            double_click_time:    this.settings.get_int('double-click-time'), 
             save_done:            (dlg_, result, dir_, file_name_) => {
                 if(result){
                     if(dir_){
-                        this._caller.settings.set_string("filespath", dir_.get_path());
+                        this.settings.set_string("filespath", dir_.get_path());
                     }
                     if(file_name_ && (file_name_ instanceof String || typeof file_name_ === 'string')){
-                        this._caller.settings.set_string("filesname", file_name_);
+                        this.settings.set_string("filesname", file_name_);
                     }
                     const filter_ = dlg_.get_filter().toString();
                     if(filter_){
-                        this._caller.settings.set_string("filter", filter_);
+                        this.settings.set_string("filter", filter_);
                     }
                 } // if(result) //
             }, 
@@ -610,23 +726,23 @@ class Indicator extends PanelMenu.Button {
         let _etag     = null;
         let dlg       = null;
         try {
-            const _dir        = this._caller.filespath;
-            const _file_name  = this._caller.filesname;
+            const _dir        = this.filespath;
+            const _file_name  = this.filesname;
             const _dialogtype = Gzz.GzzDialogType.Open;
             dlg = new Gzz.GzzFileDialog({
                 title:                'Load File', 
                 dir:                  _dir, 
                 file_name:            _file_name, 
                 dialogtype:           _dialogtype, 
-                display_times:        this._caller.settings.get_enum('time-type'), 
-                display_inode:        this._caller.settings.get_boolean('display-inode'), 
-                display_user_group:   this._caller.settings.get_enum('user-group'), 
-                display_mode:         this._caller.settings.get_boolean('display-mode'),
-                display_number_links: this._caller.settings.get_boolean('display-number-links'),
-                display_size:         this._caller.settings.get_boolean('display-size'),
-                show_icon:            this._caller.settings.get_boolean('display-icon'),
-                base2_file_sizes:     this._caller.settings.get_boolean('base2-file-sizes'),
-                filter:               Gzz.string2RegExp(this._caller.settings.get_string('filter'), 'i'), 
+                display_times:        this.settings.get_enum('time-type'), 
+                display_inode:        this.settings.get_boolean('display-inode'), 
+                display_user_group:   this.settings.get_enum('user-group'), 
+                display_mode:         this.settings.get_boolean('display-mode'),
+                display_number_links: this.settings.get_boolean('display-number-links'),
+                display_size:         this.settings.get_boolean('display-size'),
+                show_icon:            this.settings.get_boolean('display-icon'),
+                base2_file_sizes:     this.settings.get_boolean('base2-file-sizes'),
+                filter:               Gzz.string2RegExp(this.settings.get_string('filter'), 'i'), 
                 filters:              [
                     new RegExp('^.*\\.txt$',                'i'), 
                     new RegExp('^.*\\.files$',              'i'), 
@@ -634,7 +750,7 @@ class Indicator extends PanelMenu.Button {
                     new RegExp('^.*$',                      'i'), 
                 ], 
                 filters_flags:        'i', 
-                double_click_time:    this._caller.settings.get_int('double-click-time'), 
+                double_click_time:    this.settings.get_int('double-click-time'), 
                 save_done:            (dlg_, result, _dir, _file_name) => {
                     if(result){
                         filesfile = dlg_.get_full_path();
@@ -643,7 +759,7 @@ class Indicator extends PanelMenu.Button {
                             if(ok){
                                 const contents_ = new TextDecoder().decode(contents);
                                 let max_length = -1;
-                                let min_length = this._caller.max_file_entry_length + 1;
+                                let min_length = this.max_file_entry_length + 1;
                                 let files      = []
                                 let cnt        = 0;
                                 LogMessage.log_message( 'files', `Indicator::callback: contents_ == ${contents_}`, new Error());
@@ -653,21 +769,21 @@ class Indicator extends PanelMenu.Button {
                                 for(const file of array_of_files){
                                     max_length = Math.max(max_length, file.length);
                                     min_length = Math.min(min_length, file.length);
-                                    if(0 < file.length && file.length <= this._caller.max_file_entry_length){
+                                    if(0 < file.length && file.length <= this.max_file_entry_length){
                                         cnt++;
-                                        if(cnt > this._caller.show_messages){
+                                        if(cnt > this.show_messages){
                                             continue;
                                         }
                                         files.push(file);
                                     }
                                 } // for(const file of array_of_files) //
-                                this._caller.filesname = dlg.get_file_name();
-                                this._caller.filespath = dlg.get_dir();
-                                this._caller.settings.set_string("filesname", this._caller.filesname);
-                                this._caller.settings.set_string("filespath", this._caller.filespath.get_path());
+                                this.filesname = dlg.get_file_name();
+                                this.filespath = dlg.get_dir();
+                                this.settings.set_string("filesname", this.filesname);
+                                this.settings.set_string("filespath", this.filespath.get_path());
                                 if(files.length > 0){
-                                    this._caller.files = files;
-                                    this._caller.settings.set_strv('files', this._caller.files);
+                                    this.files = files;
+                                    this.settings.set_strv('files', this.files);
                                 }else{
                                     this._caller.display_error_msg(
                                         'Indicator::get_file_contents',
@@ -682,11 +798,11 @@ class Indicator extends PanelMenu.Button {
                                         new Error()
                                     );
                                 }
-                                if(max_length > this._caller.max_file_entry_length){
+                                if(max_length > this.max_file_entry_length){
                                     this._caller.display_error_msg('Indicator::get_file_contents',
                                         "Error: some of the files where too big they were skipped.\n"
                                          + " THis can be caused by a change in the max_file_entry_length property. "
-                                         + `currently set at ${this._caller.max_file_entry_length}`, 
+                                         + `currently set at ${this.max_file_entry_length}`, 
                                         new Error()
                                     );
                                 }
@@ -694,7 +810,7 @@ class Indicator extends PanelMenu.Button {
                         } // if(filesfile) //
                         const filter_ = dlg_.get_filter().toString();
                         if(filter_){
-                            this._caller.settings.set_string("filter", filter_);
+                            this.settings.set_string("filter", filter_);
                         }
                     } // if(result) //
                 }, 
@@ -762,14 +878,14 @@ class Indicator extends PanelMenu.Button {
 
         this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
 
-        this._caller.files = this._caller.settings.get_strv('files');
-        const len = this._caller.files.length;
+        this.files = this.settings.get_strv('files');
+        const len = this.files.length;
         LogMessage.log_message( LogMessage.get_prog_id(), `Indicator::loadFileEntries: len  == ‷${len}‴`, new Error());
-        const length = Math.min(this._caller.settings.get_int('show-messages'), len);
+        const length = Math.min(this.settings.get_int('show-messages'), len);
         LogMessage.log_message( LogMessage.get_prog_id(), `Indicator::loadFileEntries: length  == ‷${length}‴`, new Error());
         for(let i = 0; i < length; i++){
-            submenu = new PopupMenu.PopupSubMenuMenuItem(this._caller.files[i], true, this, 0);
-            const file = Gio.File.new_for_path(this._caller.files[i]);
+            submenu = new PopupMenu.PopupSubMenuMenuItem(this.files[i], true, this, 0);
+            const file = Gio.File.new_for_path(this.files[i]);
             if(!file) continue;
             [ok, data] = Gzz.fileData(file);
             if(ok){
@@ -816,7 +932,7 @@ class Indicator extends PanelMenu.Button {
                         { text: 'Open...', index: i, type: 'file', subtype: 'edit', });
                     //item.connect('activate', (event) => { item.activate(event); });
                     submenu.menu.addMenuItem(item);
-                    const [ok_, type_, _subtype, _params, ] = Gzz.mime_type(this._caller.files[i]);
+                    const [ok_, type_, _subtype, _params, ] = Gzz.mime_type(this.files[i]);
                     LogMessage.log_message(
                         LogMessage.get_prog_id(), `Indicator::loadFileEntries: ok_  == ‷${ok_}‴`, new Error()
                     );
@@ -863,10 +979,10 @@ class Indicator extends PanelMenu.Button {
     }
 
     setIconImage() {
-        const iconIndex = this._caller.settings.get_int('menu-button-icon-image');
-        const isMonochrome = this._caller.settings.get_boolean('monochrome-icon');
-        const useCustomIcon = this._caller.settings.get_boolean('use-custom-icon');
-        const customIconPath = this._caller.settings.get_string('custom-icon-path');
+        const iconIndex = this.settings.get_int('menu-button-icon-image');
+        const isMonochrome = this.settings.get_boolean('monochrome-icon');
+        const useCustomIcon = this.settings.get_boolean('use-custom-icon');
+        const customIconPath = this.settings.get_string('custom-icon-path');
         let iconPath;
         let notFound = false;
 
@@ -875,9 +991,9 @@ class Indicator extends PanelMenu.Button {
             const fileExists = GLib.file_test(iconPath, GLib.FileTest.IS_REGULAR);
             if(!fileExists){
                 iconPath = 'start-here-symbolic';
-                this._caller.settings.set_boolean('monochrome-icon', true);
-                this._caller.settings.set_int('menu-button-icon-image', 0);
-                this._caller.settings.set_boolean('use-custom-icon', false);
+                this.settings.set_boolean('monochrome-icon', true);
+                this.settings.set_int('menu-button-icon-image', 0);
+                this.settings.set_boolean('use-custom-icon', false);
             }
         } else if (isMonochrome) {
             if (Constants.MonochromeFileIcons[iconIndex] !== undefined) {
@@ -895,26 +1011,40 @@ class Indicator extends PanelMenu.Button {
 
         if (notFound) {
             iconPath = 'start-here-symbolic';
-            this._caller.settings.set_boolean('monochrome-icon', true);
-            this._caller.settings.set_int('menu-button-icon-image', 0);
+            this.settings.set_boolean('monochrome-icon', true);
+            this.settings.set_int('menu-button-icon-image', 0);
         }
 
         this.icon.gicon = Gio.icon_new_for_string(iconPath);
     }
 
     setIconSize() {
-        const iconSize = this._caller.settings.get_int('menu-button-icon-size');
+        const iconSize = this.settings.get_int('menu-button-icon-size');
         this.icon.icon_size = iconSize;
     }
     
     hideIconShadow() {
-    	const iconShadow = this._caller.settings.get_boolean('hide-icon-shadow');
+    	const iconShadow = this.settings.get_boolean('hide-icon-shadow');
     	
         if(!iconShadow){
             this.icon.add_style_class_name('system-status-icon'); 
         } else {
             this.icon.remove_style_class_name('system-status-icon');
         }
+    }
+
+    destroy(){
+        this.settings.disconnect(this.settingsID_show);
+        this.settings.disconnect(this.settingsID_area);
+        this.settings.disconnect(this.settingsID_pos);
+        this.settings.disconnect(this.settingsID_files);
+        this.settings.disconnect(this.settingsID_max);
+        this.settings.disconnect(this.settingsID_dir);
+        this.settings.disconnect(this.settingsID_filename);
+        this.appSys   = null;
+        this.settings = null;
+        Main.panel.statusArea[this._caller._name] = null;
+        super._onDestroy();
     }
 
 } // class Indicator extends PanelMenu.Button //
@@ -925,116 +1055,17 @@ export default class FilesLauncherExtension extends Extension {
     constructor(metadata){
         super(metadata);
         this._indicator           = null;
-        this.settings             = null;
         const id                  = this.uuid;
         const indx                = id.indexOf('@');
         this._name                = id.substr(0, indx);
-        this.settings_change_self = false;
-        this.areas                = ["left", "center", "right"];
     }
 
     enable() {
-        this.appSys                  = Shell.AppSystem.get_default();
-        this.settings                = this.getSettings();
-        this.show_messages           = this.settings.get_int("show-messages");
-        this.page_name               = this.settings.get_enum("page");
-        this.index                   = this.settings.get_int("index");
-        this.files                   = this.settings.get_strv("files");
-        this.max_file_entry_length   = this.settings.get_int("max-file-entry-length");
-        this.edit_page               = this.settings.get_boolean("edit-page");
-        this.filesname               = this.settings.get_string("filesname");
-        const tmp_path               = this.settings.get_string("filespath").trim();
-        this.set_filespath(tmp_path);
-        
-        LogMessage.set_prog_id('files-launcher');
-        LogMessage.set_show_logs(this.settings.get_boolean('show-logs'));
-        this.settings.set_enum('area', this.settings.get_enum('area'));
-        if(this.settings.get_int("position") < 0 || this.settings.get_int("position") > 25) this.settings.set_int("position", 0);
-        this.settings.set_int('max-file-entry-length', this.max_file_entry_length);
-        this.settings.set_int('show-messages', this.settings.get_int('show-messages'));
         this._indicator       = new Indicator(this);
-        const area            = this.areas[this.settings.get_enum("area")];
-        LogMessage.log_message(LogMessage.get_prog_id(), `area == ${area}`, new Error());
-        Main.panel.addToStatusArea(this._name, this._indicator, this.settings.get_int("position"), area);
-
-        this.settingsID_show     = this.settings.connect("changed::show-messages", () => {
-            this.show_messages   = this.settings.get_int("show-messages");
-            this._indicator.refesh_menu();
-        }); 
-        this.settingsID_area     = this.settings.connect("changed::area", this.onPositionChanged.bind(this)); 
-        this.settingsID_pos      = this.settings.connect("changed::position", this.onPositionChanged.bind(this)); 
-        this.settingsID_files    = this.settings.connect("changed::files", this.onFilesChanged.bind(this)); 
-        this.settingsID_max      = this.settings.connect("changed::max-file-entry-length", () => {
-            this.max_file_entry_length = this.settings.get_int("max-file-entry-length");
-            this._indicator.refesh_menu();
-        }); 
-        this.settingsID_dir      = this.settings.connect('changed::filespath', () => {
-            this.set_filespath(this.settings.get_string("filespath").trim());
-        });
-        this.settingsID_filename = this.settings.connect('changed::filesname', () => {
-            this.filesname         = this.settings.get_string("filesname");
-        });
-        this.settingsID_icon_size = this.settings.connect('changed::menu-button-icon-size', () => {
-            this._indicator.refesh_menu();
-        });
-        this.settingsID_show_logs = this.settings.connect('changed::show-logs', () => {
-            LogMessage.set_show_logs(this.settings.get_boolean('show-logs'));
-        });
     }
-
-    set_filespath(path_){
-        LogMessage.log_message(LogMessage.get_prog_id(), `FilesLauncherExtension::set_filespath: path_: ${path_}`, new Error());
-        if(!path_){
-            this.filespath = Gio.File.new_for_path(GLib.build_filenamev([GLib.get_home_dir()]));
-            this.settings.set_string("filespath", this.filespath.get_path());
-        }else if(path_ instanceof String){
-            const path = GLib.build_filenamev([path_.toString()]);
-            if(path){
-                this.filespath = Gio.File.new_for_path(path);
-            }else{
-                LogMessage.log_message(
-                    LogMessage.get_prog_id(), 
-                    `FilesLauncherExtension::set_filespath_error: bad value for path: ${path}: `
-                    + `genrated from path_: ${path_}:`, 
-                    new Error()
-                );
-                this.display_error_msg(
-                    'FilesLauncherExtension::set_filespath',
-                    `FilesLauncherExtension::set_filespath: bad value for path: ${path} genrated from path_: ${path_}: `, 
-                    new Error()
-                );
-            }
-        }else{ // if(!path_) else if(path_ instanceof String) //
-            const path = GLib.build_filenamev([path_.toString()]);
-            if(path){
-                this.filespath = Gio.File.new_for_path(path);
-            }else{
-                LogMessage.log_message(
-                    LogMessage.get_prog_id(), 
-                    `FilesLauncherExtension::set_filespath_error: bad value for path: ${path}: `
-                    + `genrated from path_: ${path_}:`, 
-                    new Error()
-                );
-                this.display_error_msg(
-                    'FilesLauncherExtension::set_filespath',
-                    `FilesLauncherExtension::set_filespath: bad value for path: ${path} genrated from path_: ${path_}: `,
-                    new Error()
-                );
-            } // if(path) ... else ... //
-        } // if(!path_) else if(path_ instanceof String) ... else ... //
-    } // set_filespath(path_) //
 
     disable() {
         this._indicator.destroy();
-        this.settings.disconnect(this.settingsID_show);
-        this.settings.disconnect(this.settingsID_area);
-        this.settings.disconnect(this.settingsID_pos);
-        this.settings.disconnect(this.settingsID_files);
-        this.settings.disconnect(this.settingsID_max);
-        this.settings.disconnect(this.settingsID_dir);
-        this.settings.disconnect(this.settingsID_filename);
-        delete this.appSys;
-        delete this.settings;
         this._indicator = null;
     }
 
@@ -1044,26 +1075,6 @@ export default class FilesLauncherExtension extends Extension {
         }
         const dlg = new Gzz.GzzMessageDialog(title, description, 'dialog-error');
         dlg.open();
-    }
-
-    onPositionChanged(){
-        Main.panel.menuManager.removeMenu(this._indicator.menu);
-        Main.panel.statusArea[this._name] = null;
-        const area      = this.areas[this.settings.get_enum("area")];
-        LogMessage.log_message(LogMessage.get_prog_id(), `area == ${area}`, new Error());
-        const position  = this.settings.get_int("position");
-        Main.panel.addToStatusArea(this._name, this._indicator, position, area);
-    }
-
-    onFilesChanged(){
-        if(this.settings_change_self){
-            this.settings_change_self = false;
-        }else{
-            this.files                        = this.settings.get_strv("files");
-            LogMessage.log_message(LogMessage.get_prog_id(), `FilesLauncherExtension::onFilesChanged: this.files: ${JSON.stringify(this.files)}`, new Error());
-            this._indicator.refesh_menu();
-            LogMessage.log_message(LogMessage.get_prog_id(), `FilesLauncherExtension::onFilesChanged: this.files: ${JSON.stringify(this.files)}`, new Error());
-        }
     }
 
 } // export default class FilesLauncherExtension extends Extension //
