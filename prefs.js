@@ -1137,7 +1137,7 @@ class EditFileEntry extends PageBase {
             valign: Gtk.Align.CENTER,
         });
         this.edit           = new Adw.ActionRow({ 
-            title:      _(""), 
+            title:      "", 
             subtitle:   "", 
         });
         const file_add = new Gtk.Button({
