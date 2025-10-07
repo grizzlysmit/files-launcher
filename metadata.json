@@ -7,7 +7,8 @@
   "settings-schema": "org.gnome.shell.extensions.files-launcher",
   "url": "https://github.com/grizzlysmit/files-launcher",
   "shell-version": [
-    "48"
+    "48",
+    "49"
   ],
   "version": 1
 }
